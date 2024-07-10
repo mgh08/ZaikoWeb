@@ -1,0 +1,262 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="{% static 'API/css/styleAdmin.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'API\img\logo\logo-2.ico' %}">
+    {% block css %}
+    {% endblock %}
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="admin.html"><img src="{% static 'API/img/logo/logo-1.png' %}" alt="logo"></a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <input class="form-control" type="text" placeholder="buscar..." aria-label="Buscar"
+                    aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i
+                        class="fas fa-search"></i></button>
+            </div>
+        </form>
+
+        <!-- Menu desplegable-->
+        <ul class="d-flex navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    Bienvenido <strong>{{ request.session.logueo.nombre }}</strong> ({{ request.session.logueo.rol }})
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#">Perfil</a></li>
+                    <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+                </ul>
+            </li>
+            <!--Carrito-->
+            <li class="nav-item">
+                <a onclick="ver_carrito(`{% url 'ver_carrito' %}`)" class="nav-link position-relative" href="" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                    <i class="fa-solid fa-cart-flatbed"></i>
+                    <span class="position-relative top-0 start-75 translate-middle badge rounded-pill bg-danger" style="margin-left:0.5rem;">{{ request.session.items_carrito|default:0 }}</span>
+                </a>
+            </li>
+        </ul>
+
+       
+        
+        
+
+    </nav>
+    <div id="layoutSidenav">
+        
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">Tienda</div>
+
+                        <a class="nav-link" href="{% url 'productos_listar_software' %}">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+                            editar software
+                        </a>
+                        
+                        <a class="nav-link" href="{% url 'tienda' %}">
+                            <div class="sb-nav-link-icon"><i class="fa-brands fa-shopify"></i></div>
+                            Adquiri software
+                        </a>
+                        <div class="sb-sidenav-menu-heading">Menu</div>
+                        <a class="nav-link" href="{% url 'panelDeGestion' %}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Panel de gestión
+                        </a>
+                        <div class="sb-sidenav-menu-heading">Interfaces</div>
+                        <!--Proveedores-->
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseProveedores" aria-expanded="false"
+                            aria-controls="collapseProveedores">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-truck-field"></i></div>
+                            Proveedores
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseProveedores" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'registrarProveedores' %}">Registrar Proveedores</a>
+                                <a class="nav-link" href="{% url 'listarProveedores' %}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Listar Proveedores
+                                </a>
+                            </nav>
+                        </div>
+                        <!--inventario-->
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseInventario" aria-expanded="false"
+                            aria-controls="collapseInventario">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                            inventario
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseInventario" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'registrar_producto' %}">Registrar Productos</a>
+                                <a class="nav-link" href="{% url 'buscar_productos' %}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Listar Productos
+                                </a>
+                            </nav>
+                        </div>
+                        <!--Clientes-->
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseClientes" aria-expanded="false" aria-controls="collapseClientes">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+                            Clientes
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseClientes" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'clientes_formulario' %}">Registrar Clientes</a>
+                                <a class="nav-link" href="{% url 'clientes' %}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Listar Clientes
+                                </a>
+                            </nav>
+                        </div>
+                        <!--Devoluciones-->
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseDevoluciones" aria-expanded="false"
+                            aria-controls="collapseDevoluciones">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-box-open"></i></div>
+                            Devoluciones
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseDevoluciones" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'registrar_devoluciones' %}">Registrar Devoluciones</a>
+                                <a class="nav-link" href="{% url 'listarDevoluciones' %}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Listar Devoluciones
+                                </a>
+                            </nav>
+                        </div>
+                        <!--Seguridad-->
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            Seguridad
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseSeguridad" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="#">Registrar Usuarios</a>
+                                <a class="nav-link" href="tables.html">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Listar Usuarios
+                                </a>
+                            </nav>
+                        </div>
+
+                        <!--Auditoria-->
+                        <a class="nav-link collapsed" href="auditoria.html">
+                            <div class="sb-nav-link-icon"><i class="fa-brands fa-audible"></i></div>
+                            Auditoria
+                        </a>
+
+
+                        <!--Addons-->
+                        <div class="sb-sidenav-menu-heading">Completentos</div>
+                        <a class="nav-link" href="{% url 'graficos' %}">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-chart-column"></i></div>
+                            Gráficos
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+            
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    
+                    {% block contenido%}
+
+                    {%  endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer class="py-4 mt-auto footer-admin">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-center justify-content-center small">
+                <div class="grupo-2" style="text-align: center;">
+                    <small>&copy; 2023 <b>infinite cod</b> - Todos los Derechos Reservados</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        ...
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="{% static 'API/js/scripts.js' %}"></script>
+     <!--graficas-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'API/demo/chart-area-demo.js' %}"></script>
+    <script src="{% static 'API/demo/chart-bar-demo.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"crossorigin="anonymous"></script>
+    <script src="{% static 'API/js/datatables-simple-demo.js' %}"></script>
+    <!--menu-->
+    <script src="{% static 'API/js/menu.js' %}"></script> 
+    <!-- transicion entre paginas
+    <script src="{% static 'API/js/transicion.js' %}"></script>  -->
+    <!--js carrito-->
+    <script src="{% static 'API/js/libreria.js' %}"></script>
+    <!--jquery-->
+    <script src="{% static 'API/js/jquery-3.7.1.min.js' %}"></script>
+    <!-- sweetalert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                 Swal.fire({
+                title: "{% if message.tags and message.tags == 'error' %}Error{% else %}{{ message.tags }}{% endif %}",
+                text: "{{ message }}",
+                icon: "{% if message.tags and message.tags == 'error' %}error{% elif message.tags and message.tags == 'warning' %}warning{% elif message.tags and message.tags == 'info' %}info{% else %}success{% endif %}",
+                confirmButtonText: 'OK'
+            });
+            </script>
+        {% endfor %}
+    {% endif %}
+
+    {% block js %}
+    {% endblock %}
+    
+</body>
+
+</html>

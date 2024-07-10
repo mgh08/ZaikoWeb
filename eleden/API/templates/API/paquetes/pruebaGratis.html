@@ -1,0 +1,35 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="contenedor-demo">
+
+        <div class="contenedor-paquetes">
+            <div style="text-align: center;">
+                <img src="{% static 'API/img/logo-planes/free.png' %}" alt="">
+                <br>
+                <br>
+                <p><strong>InfiniteCode</strong></p>
+                <p><strong>Prueba Gratuita</strong></p>
+            </div>
+            <div class="col">
+                <h1>Detalles del Producto</h1>
+                <p><strong>Nombre del Producto:</strong> Prueba Gratuita</p>
+                <div class="parrafo-paquetes">
+                    <p><strong>Descripción:</strong> Con esta opción, tendrás acceso completo a todas las características de nuestros paquetes durante 15 días. Aprovecha al máximo nuestra oferta durante este período de tiempo. Nuestro paquete de software ofrece una solución integral para la gestión de inventario, diseñada específicamente para empresas en crecimiento. Con características avanzadas y herramientas intuitivas, podrás optimizar la gestión de tu inventario, implementar estrategias de control de existencias más sofisticadas y obtener una visión profunda de tus operaciones comerciales. Maximiza la eficiencia, minimiza los errores y haz crecer tu negocio con nuestra solución de gestión de inventario durante este período de prueba de 15 días.</p>
+                </div>
+                <p><strong>Versión:</strong> 1.0</p>
+                <p><strong>Precio:</strong> $99.99</p>
+                <p><strong>Categoría:</strong> Software de Gestión</p>
+                <p><strong>Plataforma:</strong> Windows, MacOS, Linux</p>
+                <form>
+                    <a href="#" type="submit" class="btn btn-primary">agregar al carrito</a>
+                </form>
+            </div>    
+        </div>
+</section>
+
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'API/bases/baseAdmin.html' %}
+{% load humanize %}
+{% load static %}
+{% block contenido %}
+
+<div class="tablas-formularios">
+    <h1>Actualizar Paquete</h1>
+
+    <form action="{% if registro %}{% url 'productos_actualizar_software' %}{% else %}{% url 'productos_guardar_software' %}{% endif %}" method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ registro.id }}"><br>
+        <label>Foto:</label>
+        <input type="file" name="foto" class="form-control" value="{{ registro.foto }}" accept="image/*">
+        <label>Nombre: </label>
+        <input type="text" name="nombre" class="form-control" value="{{ registro.nombre }}"><br>
+        <label>Descripcion: </label>
+        <input type="text" name="descripcion" class="form-control" value="{{ registro.descripcion }}"><br> 
+        <label>Stock: </label>
+        <input type="number" name="stock" class="form-control" value="{{ registro.stock }}"><br>
+        <label>Precio: </label>
+        <input type="number" name="precio" class="form-control" value="{{ registro.precio }}"><br>
+        
+        <br>
+        <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+    </form>
+</div>
+    
+{% endblock %}

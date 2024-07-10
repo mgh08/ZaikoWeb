@@ -1,0 +1,81 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="tablas tablas-formularios">
+    <form action="{% if registro %}{% url 'productos_actualizar' registro.id %}{% else %}{% url 'productos_guardar' %}{% endif %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="regresar">
+            <h1 class="title-tablas">Registrar productos</h1>
+            <a class="btn-regresar" href="{% url 'productoTerminado' %}"><i class="fa-solid fa-reply"></i></a>
+        </div>
+        <div class="mb-3 ">
+            <input type="hidden" name="id" value="{{ registro.id }}"><br>
+            <label for="nombre" class="form-label">Nombre del Producto</label>
+            <input type="text" class="form-control" value="{{ registro.nombre }}" name="nombre" pattern="[A-Za-z\s]*" placeholder="Escribe el nombre del producto" required>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="unidad_medida" class="form-label">Unidad de medida</label>
+                    <select class="form-select" value="{{ registro.unidad_medida }}" name="unidad_medida" required>
+                        <option value="">Selecciona una medida</option>
+                        <option value="electrónica">Pacas</option>
+                        <option value="ropa">Gramos</option>
+                        <option value="alimentos">Kilos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="lote" class="form-label">Lote</label>
+                    <input type="text" class="form-control" value="{{ registro.lote }}" name="lote" placeholder="Escribe el número de lote" required>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="cantidad" class="form-label">Cantidad</label>
+                    <input type="number" class="form-control" value="{{ registro.cantidad }}" name="cantidad" placeholder="Escribe la cantidad" min="0" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="categorias" class="form-label">Categoría</label>
+                    <select class="form-control" name="categorias" required>
+                        <option value="">Selecciona una categoría</option>
+                        {% for c in categorias %}
+                        <option value="{{ c.id }}" {% if registro.CategoriaProducto.id == c.id %}selected{% endif %}>{{ c.nombre_categoria }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento</label>
+                    <input type="date" class="form-control" value="{{ registro.fecha_vencimiento }}" name="fecha_vencimiento">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="precio" class="form-label">Precio</label>
+                    <input type="number" class="form-control" value="{{ registro.precio }}" name="precio" placeholder="Escribe el precio" min="0" step="0.01" required>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen del Producto</label>
+            <input type="file" class="form-control" value="{{ registro.foto }}" name="foto" id="foto" accept="image/*">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

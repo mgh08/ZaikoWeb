@@ -1,0 +1,47 @@
+{% load humanize %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags and message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasRightLabel">Productos ({{ request.session.items_carrito|default:0 }})</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in data  %}
+                <tr>
+                    <td>
+                        <img src="{{ p.foto.url }}" width="20%" />
+                        <br>
+                        {{ p.nombre }}<br>Precio: <strong>${{ p.precio|intcomma }}</strong>
+                    </td>
+                    <td>{{ p.cantidad }}</td>
+                    <td>${{ p.subtotal|intcomma }}</td>
+                    <td><a href="javascript:del_item_carrito(`{% url 'eliminar_item_carrito' p.id %}`);"><i class="fa-solid fa-circle-xmark"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        Total: <strong>${{ total|intcomma }}</strong><br/><br/>
+        <div style="display: flex;flex-direction: column; width: 150px;margin: auto;">
+            <a href="{% url 'vaciar_carrito' %}" class="btn btn-secondary">Vaciar carrito</a>
+            <br>
+            <a href="{% url 'guardar_compra' %}" class="btn btn-primary">Comprar</a>
+        </div>
+    </div>
+

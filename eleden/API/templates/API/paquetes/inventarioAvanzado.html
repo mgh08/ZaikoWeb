@@ -1,0 +1,34 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="contenedor-demo">
+
+        <div class="contenedor-paquetes">
+            <div style="text-align: center;">
+                <img src="{% static 'API/img/logo-planes/inventario-02.png' %}" alt="">
+                <br>
+                <p><strong>InfiniteCode</strong></p>
+                <p><strong>Inventario Avanzado</strong></p>
+            </div>
+            <div class="col">
+                <h1>Detalles del Producto</h1>
+                <p><strong>Nombre del Producto:</strong> Inventario Avanzado</p>
+                <div class="parrafo-paquetes">
+                    <p><strong>Descripción:</strong> El paquete de software de Inventario Avanzado de InfiniteCode es la elección ideal para empresas en crecimiento que buscan llevar su gestión de inventario al siguiente nivel. Diseñado para ofrecer un mayor nivel de control y funcionalidad, nuestro sistema proporciona herramientas avanzadas para optimizar la gestión de tu inventario y satisfacer las demandas de un entorno empresarial en evolución. Con el Inventario Avanzado, podrás realizar un seguimiento detallado de tus productos, implementar estrategias de control de existencias más sofisticadas y obtener una visión más profunda de tus operaciones comerciales. Maximiza la eficiencia, minimiza los errores y haz crecer tu negocio con nuestro completo paquete de Inventario Avanzado.</p>
+                </div>
+                <p><strong>Versión:</strong> 1.0</p>
+                <p><strong>Precio:</strong> $99.99</p>
+                <p><strong>Categoría:</strong> Software de Gestión</p>
+                <p><strong>Plataforma:</strong> Windows, MacOS, Linux</p>
+                <form>
+                    <a href="#" type="submit" class="btn btn-primary">agregar al carrito</a>
+                </form>
+            </div>    
+        </div>
+</section>
+
+
+{% endblock %}

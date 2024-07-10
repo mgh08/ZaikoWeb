@@ -1,0 +1,3 @@
+venv/
+eleden/API/migrations
+eleden/db.sqlite3

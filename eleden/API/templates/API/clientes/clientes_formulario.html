@@ -1,0 +1,27 @@
+{% extends 'API/bases/baseAdmin.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="tablas tablas-formularios">
+    <form action="{% if registro %}{% url 'clientes_actualizar' %}{% else %}{% url 'clientes_guardar' %}{% endif %}" method="post">
+        {% csrf_token %}
+        <div class="regresar">
+            <h1 class="title-tablas">Crear o actualizar Cliente</h1>
+            <a class="btn-regresar" href="{% url 'clientes' %}"><i class="fa-solid fa-reply"></i></a>
+        </div>
+        <input type="hidden" name="id" value="{{ registro.id }}"><br>
+        <label>Nombre: </label>
+        <input type="text" name="nombre" class="form-control" value="{{ registro.nombre }}"><br>
+        <label>NIT: </label>
+        <input type="text" name="nit" class="form-control" value="{{ registro.nit }}"><br>
+        <label>Contacto: </label>
+        <input type="text" name="contacto" class="form-control" value="{{ registro.contacto }}"><br>
+        <label>Correo_Electronico: </label>
+        <input type="text" name="correo_electronico" class="form-control" value="{{ registro.correo_electronico }}"><br>
+        <label>Direccion: </label>
+        <input type="text" name="direccion" class="form-control" value="{{ registro.direccion }}"><br>
+        <br>
+        <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+    </form>
+</section>
+{% endblock %}

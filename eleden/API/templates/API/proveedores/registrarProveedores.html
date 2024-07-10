@@ -1,0 +1,40 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido  %}
+<div >
+    <div class="card mb-4">
+        <div style="padding: 30px;">
+            <form action="{% if registro %}{% url 'proveedores_actualizar' %}{% else %}{% url 'proveedores_guardar' %}{% endif %}" method="post">
+            {% csrf_token %}
+                <div class="regresar">
+                    <h1 class="mt-4 title-tablas">Registro de Proveedores</h1>
+                    <a class="btn-regresar" href="{% url 'listarProveedores' %}"><i class="fa-solid fa-reply"></i></a>
+                </div>
+                <input type="hidden" name="id" value="{{registro.id}}"><br>
+                <label for="nombre" class="form-label">Nombre Proveedor</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ registro.nombre }}" placeholder="Escribe el nombre de la empresa" pattern="[A-Za-z\s]*" title="Por favor, ingrese solo letras" required>
+
+                <label for="nit" class="form-label">NIT</label>
+                <input type="number" class="form-control" id="nit" name="nit" value="{{ registro.nit }}" placeholder="Escribe el NIT de la empresa" required>
+                
+                <label for="telefono" class="form-label">Teléfono de Contacto</label>
+                <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ registro.telefono }}" placeholder="Escribe el número de teléfono" pattern="[0-9]{10}" title="Por favor, ingrese solo numeros" required>
+            
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" value="{{ registro.correo_electronico }}" placeholder="Escribe la dirección de correo electrónico" required>
+                <br>
+                <div>
+                    <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+                </div>
+            </form>
+                
+        </div>
+    </div>
+</div>
+                
+{% endblock  %}
+                       
+                    
+                       

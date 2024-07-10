@@ -1,0 +1,68 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+
+{% block contenido  %}
+
+<section class="tablas">  
+    <h1>Materia Prima</h1>
+    <form class="d-flex" role="search" action="#" method="post">
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" placeholder="Buscar por nombre o descripción..." aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+    </form>
+    <br>
+    <a class="btn btn-success btn-tablas" href="{% url 'registrarMateriaPrima' %}">Crear</a><br><br>
+    <div class="tablas-formularios">
+        <table class="table" id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>nombre</th>
+                    <th>proveedores</th>
+                    <th>unidad_medida</th>
+                    <th>cantidad</th>
+                    <th>fecha_vencimiento</th>
+                    <th>foto</th>
+                    <th>ultima_actualizacion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for r in data %}
+            <tr>
+                <tr>{{ r.id }}</tr>
+                <td>{{ r.nombre }}</td>
+                <td>{{ r.proveedores }}</td>
+                <td>{{ r.unidad_medida }}</td>
+                <td>{{ r.cantidad }}</td>
+                <td>{{ r.fecha_vencimiento }}</td>
+                <td><img src="{{ r.foto.url }}" style='max-width: 100px;'/></td>
+                <td>{{ r.ultima_actualizacion }}</td>
+                
+                <td>
+                    <a class="btn btn-warning" href="{% url 'materia_prima_editar' r.id %}">Editar</a>
+                    <a class="btn btn-danger" href="{% url 'materia_prima_eliminar' r.id %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </table>
+        
+            <nav aria-label="...">
+                <ul class="pagination pagination-lg">
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+            </nav>
+        </tbody>
+            
+    </div>
+    
+<script src="{% static 'js/libreria.js' %}"></script>
+</section>
+
+{% endblock  %}

@@ -1,0 +1,33 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="contenedor-demo">
+
+    <div class="contenedor-paquetes">
+        <div style="text-align: center;">
+            <img src="{% static 'API/img/logo-planes/inventario-01.png' %}" alt="">
+            <br>
+            <p><strong>InfiniteCode</strong></p>
+            <p><strong>Inventario Básico</strong></p>
+        </div>
+        <div class="col">
+            <h1>Detalles del Producto</h1>
+            <p><strong>Nombre del Producto:</strong> Inventario Básico</p>
+            <div class="parrafo-paquetes">
+                <p><strong>Descripción:</strong> El paquete de software de Inventario Básico de InfiniteCode es la solución perfecta para gestionar eficientemente el inventario de tu empresa. Con esta herramienta completa, podrás mantener un control exhaustivo de tus productos, registrar cada artículo de manera individualizada, y optimizar la organización de tu inventario de forma sistemática. Simplifica la gestión de existencias, genera informes detallados sobre el movimiento de productos y maximiza la rentabilidad de tu negocio.</p>
+            </div>
+            <p><strong>Versión:</strong> 1.0</p>
+            <p><strong>Precio:</strong> $99.99</p>
+            <p><strong>Categoría:</strong> Software de Gestión</p>
+            <p><strong>Plataforma:</strong> Windows, MacOS, Linux</p>
+            <form>
+                <a href="#" type="submit" class="btn btn-primary">agregar al carrito</a>
+            </form>
+        </div>    
+    </div>
+</section>
+
+{% endblock %}

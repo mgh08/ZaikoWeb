@@ -1,0 +1,17 @@
+{% extends 'API/bases/baseAdmin.html' %}
+{% load static %}
+
+
+{% block contenido %}
+    <h1>Crear Categoría</h1>
+    <form action="{% if registro %}{% url 'categorias_actualizar' %}{% else %}{% url 'categorias_guardar' %}{% endif %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ registro.id }}"><br>
+        <label>Nombre: </label>
+        <input type="text" name="nombre_categoria" class="form-control" value="{{ registro.nombre_categoria }}"><br>
+        <label>Descripción: </label>
+        <textarea name="descripcion" class="form-control">{{ registro.descripcion }}</textarea>
+        <br>
+        <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+    </form>
+{% endblock %}

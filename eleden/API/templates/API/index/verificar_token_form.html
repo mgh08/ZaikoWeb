@@ -1,0 +1,13 @@
+{% extends 'inventario/base2.html' %}
+{% load static %}
+
+{% block principal %}
+    <div class="col-3 d-flex card p-3 m-auto mt-3">
+    <form action="{% url 'verificar_token_form' correo %}" method="post">
+        {% csrf_token %}
+        <label for="c">Digite el token de seguridad:</label>
+        <input id="c" type="text" name="token" class="form-control" />
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+    </div>
+{% endblock %}

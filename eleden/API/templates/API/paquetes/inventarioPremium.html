@@ -1,0 +1,35 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="contenedor-demo">
+
+    <div class="contenedor-paquetes">
+        <div style="text-align: center;">
+            <img src="{% static 'API/img/logo-planes/inventario-03.png' %}" alt="">
+            <br>
+            <p><strong>InfiniteCode</strong></p>
+            <p><strong>Inventario Premium</strong></p>
+        </div>
+        <div class="col">
+            <h1>Detalles del Producto</h1>
+            <p><strong>Nombre del Producto:</strong> Inventario Premium</p>
+            <div class="parrafo-paquetes">
+                <p><strong>Descripción:</strong> El paquete de software de Inventario Avanzado de InfiniteCode ofrece una solución robusta y escalable para la gestión de inventario en entornos empresariales complejos. Con características de vanguardia, como el rastreo de lotes, que permite la identificación y seguimiento de productos por lotes específicos, la gestión de múltiples ubicaciones, que facilita la administración de inventarios distribuidos en diferentes almacenes o instalaciones, y el control de personal, que proporciona un sistema de permisos y roles para garantizar la seguridad y la integridad de los datos. Este paquete también ofrece integración con sistemas ERP y API personalizables para una fácil adaptación a las necesidades específicas de tu empresa. Con el Inventario Avanzado, obtendrás una solución completa y tecnológicamente avanzada para optimizar la gestión de inventario y mejorar la eficiencia operativa de tu negocio.</p>
+
+            </div>
+            <p><strong>Versión:</strong> 1.0</p>
+            <p><strong>Precio:</strong> $99.99</p>
+            <p><strong>Categoría:</strong> Software de Gestión</p>
+            <p><strong>Plataforma:</strong> Windows, MacOS, Linux</p>
+            <form>
+                <a href="#" type="submit" class="btn btn-primary">agregar al carrito</a>
+            </form>
+        </div>    
+    </div>
+    
+</section>
+
+{% endblock %}

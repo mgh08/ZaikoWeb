@@ -1,0 +1,22 @@
+1- antes de empezar a programar hacer pull al projecto.
+2- moral
+3- crea los items que creas necesarios para ti, para que el quipo las pueda ver
+
+git add .
+git commit -m "algo"
+git pull origin main           (jalar)
+git push origin main           (empuja)
+git pull origin main           (jalar)
+
+
+ctrl shitf  alt  l   ------ comando para formatear texto
+
+
+
+
+
+
+
+
+
+

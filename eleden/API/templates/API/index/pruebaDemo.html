@@ -1,0 +1,136 @@
+{% extends "API/bases/baseIndex.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="contenedor-demo">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags and message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}    
+    
+    <!-- <div class="text-demo" >
+        <h1>¡Registrate para obtener tu prueba gratis!</h1>
+    </div> -->
+
+    <div class="container-form register">
+        <div class="information">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="">
+                <h2>Bienvenido</h2>
+                <p>Para unirte a nuestra comunidad por favor Inicia Sesión con tus datos</p>
+                <a href="#" id="sign-in" type="button" class="btn btn-primary"> Iniciar Sesion</a>
+            </div>
+        </div>
+        <div class="form-information">
+            <div class="form-information-childs">
+                <h2>Crear una Cuenta</h2>
+                <div class="icons">
+                    <a href="#">
+                        <i class="fa-brands fa-google"></i>
+                    </a>
+                    <a href="#">
+                        <i class="fa-brands fa-linkedin"></i>
+                    </a>
+                    <a href="#">
+                        <i class="fa-brands fa-github-alt"></i>
+                    </a>
+                </div>
+                <p>o usa tu email para registrarte</p>
+                <form class="form form-register" action="{% url 'registrarse' %}" method="post" novalidate>
+                    {% csrf_token %}
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" placeholder="Nombre completo" name="nombreCompleto" autocomplete="off" >
+                        </label>
+                    </div>
+                    <div>
+                        <label >
+                            <i class="fa-regular fa-envelope"></i>
+                            <input type="email" placeholder="Correo Electronico" name="usuario" autocomplete="off">
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Contraseña" name="clave1" autocomplete="off">
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Repetir contraseña" name="clave2" autocomplete="off">
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="container-form login hide">
+        <div class="information">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="">
+                <h2>¡Crea tu cuenta gratis!</h2>
+                <p>¡InfiniteCode es gratis por 15 días!</p>
+                <a href="#" id="sign-up" type="button" class="btn btn-primary"> Registrate</a>
+            </div>
+        </div>
+        <div class="form-information">
+            <div class="form-information-childs">
+                <h2>Inicia Sesion</h2>
+                <div class="icons">
+                    <a href="#">
+                        <i class="fa-brands fa-google"></i>
+                    </a>
+                    <a href="#">
+                        <i class="fa-brands fa-linkedin"></i>
+                    </a>
+                    <a href="#">
+                        <i class="fa-brands fa-github-alt"></i>
+                    </a>
+                </div>
+                <p>O inicar sesion con una cuenta</p>
+                <form class="form form-register" action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <br>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" placeholder="Nombre Usuario" name="usuario" autocomplete="off">
+                        </label>
+                    </div>
+                    <div class="claveForm">
+                        <label>
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Contraseña" name="clave" autocomplete="off">
+                        </label>
+                    </div>
+
+                    <div class="btn-Login">
+                        <button class="btn btn-primary" href="{% url 'recuperar_clave_form' %}">Recuperar contraseña</button>
+                        <br>
+                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                        <br>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block js%}
+<script src="{% static 'API/js/registrar-login.js' %}"></script>
+{%  endblock%}
+
+{%  endblock %}
+

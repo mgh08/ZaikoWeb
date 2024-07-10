@@ -1,0 +1,643 @@
+{% extends "API/bases/baseIndex.html" %}
+
+{% load static %}
+
+{% block contenido %}
+    <!--Portada Inicio-->
+    <div class="container__cover div__offset">
+        <div class="cover">
+            <section class="text__cover">
+                <h1>Gestiona tu inventario de forma sencilla</h1>
+                <br>
+                <h1>¡Registrate!</h1>
+                <br>
+                <p>Sujeto a <a href="#" data-bs-toggle="modal" data-bs-target="#terminos">Terminos</a> y Condiciones.
+                </p>
+                <br>
+                <a class="btn__text" data-bs-toggle="modal" data-bs-target="#register"> ¡Registrate Ahora! </a>
+
+            </section>
+            <section class="image__cover">
+                <img src="{% static 'API/img/contenido/innovacion.png' %}" alt="">
+            </section>
+        </div>
+    </div>
+
+    <div style="margin: 0px 20px;" id="sobre-nosotros">
+        <div class="cont__cover row">
+            <section>
+                <h1>¿Qué es la gestión de inventario?</h1>
+                <p>El sistema de gestión de inventario controla y rastrea los niveles de inventario, los pedidos, las
+                    ventas y las entregas de una empresa. Ayuda a identificar la cantidad correcta de existencias para
+                    ordenar.</p>
+            </section>
+        </div>
+    </div>
+
+    <!--wave-->
+
+    <div>
+        <section class="wave"></section>
+    </div>
+
+    <!--Quines somos-->
+
+    <div class="container__about div__offset">
+        <div class="about">
+
+            <div class="text__about">
+                <h1>¡Bienvenido a InfiniteCode!</h1>
+                <p>En InfiniteCode, nos especializamos en la gestión de inventarios. Nuestra empresa se enorgullece de
+                    ofrecer soluciones de gestión de inventarios muy intuitivas, accesibles económicamente y centradas
+                    en el éxito del cliente.</p>
+                <a href="" class="btn-sbns">Saber Más</a>
+            </div>
+
+            <div class="image__about">
+                <img src="{% static 'API/img/logo/img-text.png' %}" alt="">
+            </div>
+
+        </div>
+    </div>
+
+    <!--Paquetes-->
+
+    <div class="container__trust container__card-primary">
+        <section class="trust card__primary">
+            <div class="text__trust text__card-primary" id="paquetes">
+                <p>Adquiere alguno de nuestros paquetes</p>
+                <br><br>
+                <h1>GESTIONA TU INVENTARIO</h1>
+            </div>
+            <div class="container__trust container__box-cardPrimary">
+                <div class="card__trust box__card-primary">
+                    <img src="{% static 'API/img/logo-planes/inventario-01.png' %}" alt="">
+                    <h2>Inventario Básico</h2>
+                    <p>Con esta opción, podrás realizar un seguimiento de tus productos, controlar las existencias y
+                        mantener un registro ordenado de tus artículos.</p>
+                </div>
+                <div class="card__trust box__card-primary">
+                    <img src="{% static 'API/img/logo-planes/inventario-02.png' %}" alt="">
+                    <h2>Inventario Avanzado</h2>
+                    <p>El inventario avanzado es perfecto para empresas en crecimiento que requieren un mayor nivel de
+                        control y funcionalidad en su gestión de inventario.</p>
+                </div>
+                <div class="card__trust box__card-primary">
+                    <img src="{% static 'API/img/logo-planes/inventario-03.png' %}" alt="">
+                    <h2>Inventario Premium</h2>
+                    <p>Con esta opción, disfrutarás de características de vanguardia, como el rastreo de lotes, gestión
+                        de múltiples ubicaciones y control de personal.</p>
+                </div>
+            </div>
+            <br>
+            <a href="{% url 'pruebaDemo' %}" class="btn__text" style="width: 250px;height: 70px;margin-bottom: 20px;">Consigue
+                una prueba gratuita</a>
+        </section>
+    </div>
+    <!--wave Proyectos-->
+
+    <div>
+        <section class="wave-proyecto"></section>
+    </div>
+
+    <!--Proyectos-->
+
+    <div class="contenedor-proyecto" id="proyectos">
+        <section class="tarjeta-primaria">
+            <div class="texto__card-primary">
+                <h1>PROYECTOS</h1>
+                <p>Estos son algunos de nuestros proyectos</p>
+            </div>
+
+            <div class="proyectos">
+                <div class="proyecto">
+                    <img src="{% static 'API/img/proyectos/proyecto1.png' %}" alt="proyecto-1">
+                    <div class="capa">
+                        <h2>Proyecto 1</h2>
+                        <a href="https://github.com/">
+                            <i class="fa-brands fa-github-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="proyecto">
+                    <img src="{% static 'API/img/proyectos/proyecto2.png' %}" alt="proyecto-2">
+                    <div class="capa">
+                        <h2>Proyecto 2</h2>
+                        <a href="https://github.com/">
+                            <i class="fa-brands fa-github-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="proyecto">
+                    <img src="{% static 'API/img/proyectos/proyecto3.png' %}" alt="proyecto-3">
+                    <div class="capa">
+                        <h2>Proyecto 3</h2>
+                        <a href="https://github.com/">
+                            <i class="fa-brands fa-github-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="proyecto">
+                    <img src="{% static 'API/img/proyectos/proyecto4.png' %}" alt="proyecto-4">
+                    <div class="capa">
+                        <h2>Proyecto 4</h2>
+                        <a href="https://github.com/">
+                            <i class="fa-brands fa-github-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="proyecto">
+                    <img src="{% static 'API/img/proyectos/proyecto5.png' %}" alt="proyecto-5">
+                    <div class="capa">
+                        <h2>Proyecto 5</h2>
+                        <a href="https://github.com/">
+                            <i class="fa-brands fa-github-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="proyecto">
+                    <img src="{% static 'API/img/proyectos/proyecto6.png' %}" alt="proyecto-6">
+                    <div class="capa">
+                        <h2>Proyecto 6</h2>
+                        <a href="https://github.com/">
+                            <i class="fa-brands fa-github-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <a href="https://github.com/" class="btn-proyecto">Más proyectos</a>
+        </section>
+    </div>
+
+    <!--Testimonios-->
+
+    <div id="page" class="site">
+        <div class="container">
+            <div class="testi">
+                <div class="head" id="testimonios">
+                    <h2>Testimonios</h2>
+                    <p>Estos son algunos testimonios de nuestros clientes</p>
+                </div>
+                <div class="body swiper">
+                    <ul class="swiper-wrapper">
+                        <li class="swiper-slide">
+                            <div class="wrapper">
+                                <div class="thumbal">
+                                    <img src="{% static 'API/img/clientes/usuario-1.png' %}" alt="">
+                                </div>
+                                <div class="aside">
+                                    <p>" 'InfiniteCode' ha transformado nuestra gestión de inventario. Es esencial para
+                                        mantener el control y optimizar nuestras operaciones logísticas." .</p>
+                                    <div class="name">
+                                        <h4>Oscar Moreno</h4>
+                                        <p>Gerente de Logística</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="swiper-slide">
+                            <div class="wrapper">
+                                <div class="thumbal">
+                                    <img src="{% static 'API/img/clientes/usuario-2.png' %}" alt="">
+                                </div>
+                                <div class="aside">
+                                    <p>"Con 'InfiniteCode', hemos mejorado significativamente nuestra eficiencia
+                                        operativa. Su capacidad para prever demandas y gestionar inventarios nos ha
+                                        permitido reducir costos y maximizar ingresos."</p>
+                                    <div class="name">
+                                        <h4>Juan Pérez</h4>
+                                        <p>Director Financiero</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="swiper-slide">
+                            <div class="wrapper">
+                                <div class="thumbal">
+                                    <img src="{% static 'API/img/clientes/usuario-3.png' %}" alt="">
+                                </div>
+                                <div class="aside">
+                                    <p>" 'InfiniteCode' ha simplificado nuestras tareas diarias en el almacén. Su
+                                        interfaz intuitiva y funciones personalizables nos han ayudado a realizar
+                                        inventarios de manera rápida y precisa."</p>
+                                    <div class="name">
+                                        <h4>Elkin Franco</h4>
+                                        <p>Coordinadora de Almacén</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="swiper-slide">
+                            <div class="wrapper">
+                                <div class="thumbal">
+                                    <img src="{% static 'API/img/clientes/usuario-4.png' %}" alt="">
+                                </div>
+                                <div class="aside">
+                                    <p>" 'InfiniteCode' nos ha proporcionado una visión clara y precisa de nuestro
+                                        inventario en tiempo real. Esta herramienta esencial nos ha permitido tomar
+                                        decisiones informadas y estratégicas para el crecimiento de nuestra
+                                        empresa."</p>
+                                    <div class="name">
+                                        <h4>Manuel Ramirez</h4>
+                                        <p>CEO</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="swiper-slide">
+                            <div class="wrapper">
+                                <div class="thumbal">
+                                    <img src="{% static 'API/img/clientes/usuario-5.png' %}" alt="">
+                                </div>
+                                <div class="aside">
+                                    <p>"Desde que implementamos 'InfiniteCode', nuestro proceso de abastecimiento se ha
+                                        vuelto más eficiente. La automatización impecable de las compras nos ha ayudado
+                                        a mantener el stock adecuado y a evitar escaseces."</p>
+                                    <div class="name">
+                                        <h4>Ana Rodríguez</h4>
+                                        <p>Coordinadora de Compras</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="swiper-slide">
+                            <div class="wrapper">
+                                <div class="thumbal">
+                                    <img src="{% static 'API/img/clientes/usuario-6.png' %}" alt="">
+                                </div>
+                                <div class="aside">
+                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci eum est amet
+                                        eaque molestias excepturi iusto, ex tempora consectetur quam ipsum veniam facere
+                                        odio aperiam aliquid vero praesentium vel!s.</p>
+                                    <div class="name">
+                                        <h4>Jorge Gallego</h4>
+                                        <p>Almacenista</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="swiper-pagination"></div>
+                    <!-- If we need navigation buttons -->
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Contacto-->
+    <div class="contendor-contacto seccion-oscura" id="contacto">
+        <section id="contacto" class="contacto">
+            <div class="container">
+                <div class="container text-center rectangulo d-flex justify-content-evenly">
+                    <div class="row ">
+                        <div class="col-12 col-md-4 seccion-titulo">
+                            ¡Hablemos!
+                        </div>
+                        <div class="col-12 col-md-4 descripcion">
+                            Contáctanos para iniciar tu proyecto de desarrollo web y haremos que tu visión se vuelva
+                            realidad.
+                        </div>
+                        <div class="col-12 col-md-4 contenedor-contacto">
+                            <button class="btn-contacto" data-bs-toggle="modal" data-bs-target="#correoElectronico">
+                                Contacto <i class="fa-regular fa-envelope"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal Email -->
+        <div class="modal fade" id="correoElectronico" tabindex="-1" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="formularioCorreo">
+
+                        <form method="POST" action="{% url 'enviarCorreo' %}">
+                            {% csrf_token %}
+                            <h2>Enviar su formulario</h2>
+
+                            <label for="name">Nombre</label>
+                            <input type="text" name="name">
+
+                            <label for="email">Correo electrónico</label>
+                            <input type="email" name="email">
+
+                            <label for="subject">Asunto</label>
+                            <input type="text" name="subject">
+
+                            <label for="coments">Mensaje</label>
+                            <textarea name="message" cols="30" rows="5"></textarea>
+
+                            <input class="btn" type="submit" value="Enviar">
+
+                        </form>
+
+                        <div class="imgCorreo">
+                            <img src="{% static 'API/img/logo/logo-1.png' %}" alt="logo">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal registro -->
+        <div class="modal fade" id="register" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="container-form register">
+                        <div class="information">
+                            <div class="info-childs">
+                                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="">
+                                <h2>Bienvenido</h2>
+                                <p>Para unirte a nuestra comunidad por favor Inicia Sesión con tus datos</p>
+                                <a id="sign-in" type="button"> Iniciar Sesion</a>
+                            </div>
+                        </div>
+                        <div class="form-information">
+                            <div class="form-information-childs">
+                                <!-- <a id="cerrar-register" type="button" class="boton-cerrar" data-bs-dismiss="modal" aria-label="Close" >x</a> -->
+                                <h2>Crear una Cuenta</h2>
+                                <div class="icons">
+                                    <a href="#">
+                                        <i class="fa-brands fa-google"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-linkedin"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-github-alt"></i>
+                                    </a>
+                                </div>
+                                <p>o usa tu email para registrarte</p>
+                                <form class="form" action="{% url 'registrarse' %}" method='post'>
+                                    {% csrf_token %}
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-user"></i>
+                                            <input type="text" placeholder="Nombre completo" name="nombreCompleto"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-regular fa-envelope"></i>
+                                            <input type="email" placeholder="Correo Electronico" name="usuario"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" placeholder="Contraseña" name="clave1"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" placeholder="Repetir contraseña" name="clave2"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="container-form login hide">
+                        <div class="information">
+                            <div class="info-childs">
+                                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="">
+                                <h2>¡Crea tu cuenta gratis!</h2>
+                                <p>¡InfiniteCode es gratis por 15 días!</p>
+                                <a id="sign-up" type="button">Registrate</a>
+                            </div>
+                        </div>
+                        <div class="form-information">
+                            <div class="form-information-childs">
+                                <a type="button" class="boton-cerrar" data-bs-dismiss="modal" aria-label="Close"
+                                   id="cerrar-login">x</a>
+                                <h2>Inicia Sesion</h2>
+                                <div class="icons">
+                                    <a href="#">
+                                        <i class="fa-brands fa-google"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-linkedin"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-github-alt"></i>
+                                    </a>
+                                </div>
+                                <p>O inicar sesion con una cuenta</p>
+                                <form class="form form-register" action="{% url 'login' %}" method="post">
+                                    {% csrf_token %}
+                                    <br>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-user"></i>
+                                            <input type="text" placeholder="Nombre Usuario" name="usuario"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" placeholder="Contraseña" name="clave"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <br>
+                                    <div class="btn-Login">
+                                        <button class="btn btn-primary" href="{% url 'recuperar_clave_form' %}">
+                                            Recuperar contraseña
+                                        </button>
+                                        <br>
+                                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                                        <br>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal login -->
+
+        <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="container-form register-register hide2">
+                        <div class="information">
+                            <div class="info-childs">
+                                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="">
+                                <h2>Bienvenido</h2>
+                                <p>Para unirte a nuestra comunidad por favor Inicia Sesión con tus datos</p>
+                                <a id="sign-in-login" type="button"> Iniciar Sesion</a>
+                            </div>
+                        </div>
+                        <div class="form-information">
+                            <div class="form-information-childs">
+                                <!-- <a id="cerrar-register" type="button" class="boton-cerrar" data-bs-dismiss="modal" aria-label="Close" >x</a> -->
+                                <h2>Crear una Cuenta</h2>
+                                <div class="icons">
+                                    <a href="#">
+                                        <i class="fa-brands fa-google"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-linkedin"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-github-alt"></i>
+                                    </a>
+                                </div>
+                                <p>o usa tu email para registrarte</p>
+                                <form class="form form-register" action="{% url 'registrarse' %}" method="post"
+                                      novalidate>
+                                    {% csrf_token %}
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-user"></i>
+                                            <input type="text" placeholder="Nombre completo" name="nombreCompleto"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-regular fa-envelope"></i>
+                                            <input type="email" placeholder="Correo Electronico" name="usuario"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" placeholder="Contraseña" name="clave1"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" placeholder="Repetir contraseña" name="clave2"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="container-form login-login">
+                        <div class="information">
+                            <div class="info-childs">
+                                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="">
+                                <h2>¡Crea tu cuenta gratis!</h2>
+                                <p>¡InfiniteCode es gratis por 15 días!</p>
+                                <a id="sign-up-login" type="button">Registrate</a>
+                            </div>
+                        </div>
+                        <div class="form-information">
+                            <div class="form-information-childs">
+                                <a type="button" class="boton-cerrar" data-bs-dismiss="modal" aria-label="Close"
+                                   id="cerrar-login">x</a>
+                                <h2>Inicia Sesion</h2>
+                                <div class="icons">
+                                    <a href="#">
+                                        <i class="fa-brands fa-google"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-linkedin"></i>
+                                    </a>
+                                    <a href="#">
+                                        <i class="fa-brands fa-github-alt"></i>
+                                    </a>
+                                </div>
+                                <p>O inicar sesion con una cuenta</p>
+                                <form class="form form-register" action="{% url 'login' %}" method="post">
+                                    {% csrf_token %}
+                                    <br>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-user"></i>
+                                            <input type="text" placeholder="Nombre Usuario" name="usuario"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <i class="fa-solid fa-lock"></i>
+                                            <input type="password" placeholder="Contraseña" name="clave"
+                                                   autocomplete="off">
+                                        </label>
+                                    </div>
+                                    <div class="btn-Login">
+                                        <button class="btn btn-primary" href="{% url 'recuperar_clave_form' %}">
+                                            Recuperar contraseña
+                                        </button>
+                                        <br>
+                                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                                        <br>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% block js %}
+
+        <script src="{% static 'API/js/registrar-login.js' %}"></script>
+        <script src="{% static 'API/js/login.js' %}"></script>
+
+        <!--js carrusel testimonios-->
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const swiper = new Swiper('.swiper', {
+                    // Optional parameters
+                    direction: 'horizontal',
+                    loop: true,
+                    speed: 400,
+                    autoplay: true,
+                    parallax: true,
+
+
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    pagination: {
+                        el: '.swiper-pagination',
+                    }
+                });
+            })
+        </script>
+
+    {% endblock %}
+
+{% endblock %}
+

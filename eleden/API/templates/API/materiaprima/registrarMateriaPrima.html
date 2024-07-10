@@ -1,0 +1,48 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido  %}
+<div >
+    <h1 class="mt-4">Registro de Materia Prima</h1>
+    <br>
+    <div class="card mb-4">
+        <div style="margin-top: 25px; padding: 30px;">
+            <form action="{% if registro %}{% url 'materia_prima_actualizar' %}{% else %}{% url 'materia_prima_guardar' %}{% endif %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+                <input type="hidden" id="id" name="id" value="{{ registro.id }}">
+                <label for="nombre" class="form-label">Nombre Materia Prima</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ registro.nombre }}" placeholder="Materia Prima" required>
+                <br>
+                <label for="proveedores" class="form-label">Proveedores</label>
+                <input type="text" class="form-control" id="proveedores" name="proveedores" value="{{ registro.proveedores }}" placeholder="Nombre del proveedor" required>
+                <br>
+                <label for="unidad_medida" class="form-label">Unidad de medida</label>
+                    <select class="form-select"  name="unidad_medida" required>
+                        <option value="">Selecciona una medida</option>
+                        <option value="electrónica">Pacas</option>
+                        <option value="ropa">Gramos</option>
+                        <option value="alimentos">Kilos</option>
+                    </select>
+                <label for="cantidad" class="form-label">Cantidad</label>
+                <input type="number" class="form-control" id="cantidad" name="cantidad" value="{{ registro.cantidad }}" placeholder="Ingrese la cantidad" required>
+                <br> 
+                <label for="fecha_vencimiento" class="form-label">Fecha Vencimiento</label>
+                <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" value="{{ registro.fecha_vencimiento }}" placeholder="" required>
+                <br>
+                <label for="foto" class="form-label">Foto</label>
+                <input type="file" class="form-control" id="foto" name="foto" value="{{ registro.foto }}" placeholder="Adjunte la foto" required>
+                <br>
+                <label for="ultima_actualizacion" class="form-label">Ultima Actualizacion Vencimiento</label>
+                <input type="datetime-local" class="form-control" id="ultima_actualizacion" name="ultima_actualizacion" value="{{ registro.ultima_actualizacion }}" placeholder="" required>
+                <br>
+                <div>
+                    <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+                </div>
+            </form>
+                
+        </div>
+    </div>
+</div>
+                
+{% endblock  %}

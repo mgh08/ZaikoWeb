@@ -1,0 +1,22 @@
+{% extends 'inventario/base.html' %}
+{% load static %}
+
+{% block titulo %}Cambiar contraseña{% endblock %}
+
+{% block principal %}
+
+<div class="card mt-5 p-2 col-3 m-auto text-center">
+    <form action="{% url 'cambiar_clave' %}" method="post">
+        {% csrf_token %}
+        <label >Clave actual</label><br>
+        <input type="password" required="" name="actual" autofocus="" class="form-control"><br>
+
+        <label>Nueva Clave</label><br>
+        <input type="password" required="" name="nueva1" class="form-control">
+        <label>Repetir Clave</label><br>
+        <input type="password" required="" name="nueva2" class="form-control"><br>
+
+        <button type="submit" class="btn btn-info">Guardar</button>
+    </form>
+</div>
+{% endblock %}

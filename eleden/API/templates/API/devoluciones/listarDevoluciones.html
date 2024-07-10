@@ -1,0 +1,65 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido  %}
+
+<section class="tablas">  
+    {% csrf_token %}
+    <div class="tablas-formularios">
+        <h1 class="title-tablas">Devoluciones</h1>
+        <a class="btn btn-success btn-tablas" href="{% url 'registrar_devoluciones' %}"><i class="fa-solid fa-plus"></i></a>
+        <table class="table" id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>fecha_devolucion</th>
+                    <th>motivo</th>
+                    <th>productos</th>
+                    <th>Foto Producto Devuelto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for r in data %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.fecha_devolucion }}</td>
+                <td>{{ r.motivo }}</td>
+                <td>{{ r.productos }}</td>
+                <td>
+                    {% if r.foto %}
+                        <img src="{{ r.foto.url }}" style='max-width: 100px;'/>
+                    {% else %}
+                        <img src="{% static 'fotos/default.png' %}" style='max-width: 100px;'/>
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="btn btn-warning" href="{% url 'devoluciones_editar' r.id %}">Editar</a>
+                    <a class="btn btn-danger btnEliminacion" href="{% url 'devoluciones_eliminar' r.id %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </table>
+        
+            <nav aria-label="...">
+                <ul class="pagination pagination-lg">
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+            </nav>
+        </tbody>
+            
+    </div>
+    
+<script src="{% static 'js/libreria.js' %}"></script>
+</section>
+
+{% endblock  %}
+
+
+
+

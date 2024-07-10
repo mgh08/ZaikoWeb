@@ -1,0 +1,53 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido %}
+
+<section class="tablas" style="padding-top: 30px;">
+    {% csrf_token %}
+    <div class="tablas-formularios">
+        <h1 class="title-tablas">Proveedores</h1>
+        <a class="btn btn-success btn-tablas" href="{% url 'registrarProveedores' %}"><i class="fa-solid fa-plus"></i></a>
+        <table class="table" id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>nombre</th>
+                    <th>nit</th>
+                    <th>Contacto</th>
+                    <th>Correo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>    
+        
+        <tbody>
+            {% for r in data %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.nombre }}</td>
+                <td>{{ r.nit }}</td>
+                <td>{{ r.telefono }}</td>
+                <td>{{ r.correo_electronico }}</td>
+                <td>
+                    <a class="btn btn-warning" href="{% url 'proveedores_editar' r.id %}">Editar</a>
+                    <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'proveedores_eliminar' r.id %}`)">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </table>
+        
+            <nav aria-label="...">
+                <ul class="pagination pagination-lg">
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+            </nav>
+        </tbody>
+    </div> 
+</section>
+<script src="{% static 'js/libreria.js' %}"></script>
+{% endblock %}

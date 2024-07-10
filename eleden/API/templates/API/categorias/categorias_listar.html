@@ -1,0 +1,52 @@
+{% extends 'API/bases/baseAdmin.html' %}
+{% load static %}
+
+
+{% block contenido %}
+
+<section class="clientes">
+    <h1>Categorías....</h1>
+    <form class="d-flex" role="search" action="{% url 'buscar_categorias' %}" method="post">
+        {% csrf_token %}
+    </form>
+    <br>     
+    <div class="tablas-formularios">
+        <a class="btn btn-success btn-tablas" href="{% url 'categorias_formulario' %}"><i class="fa-solid fa-plus"></i></a><br><br>
+        <table class="table" id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+        <tbody>    
+            {% for r in data %}
+                <tr>
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.nombre_categoria }}</td>
+                    <td>{{ r.descripcion }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Acciones">
+                            <a class="btn btn-warning" href="{% url 'categorias_formulario_editar' r.id %}">Editar</a>
+                            <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'categorias_eliminar' r.id %}`)"><i class="fa-solid fa-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+
+            <nav aria-label="...">
+                <ul class="pagination pagination-lg">
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+            </nav>
+        </tbody>
+    </div>
+</section>  
+{% endblock %}
