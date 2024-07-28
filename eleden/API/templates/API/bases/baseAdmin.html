@@ -122,6 +122,24 @@
                                 </a>
                             </nav>
                         </div>
+                         <!--Categorias-->
+                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                         data-bs-target="#collapseCategorias" aria-expanded="false"
+                         aria-controls="collapseCategorias">
+                         <div class="sb-nav-link-icon"><i class="fa-solid fa-thumbtack"></i></div>
+                         Categorias
+                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                     </a>
+                     <div class="collapse" id="collapseCategorias" aria-labelledby="headingOne"
+                         data-bs-parent="#sidenavAccordion">
+                         <nav class="sb-sidenav-menu-nested nav">
+                             <a class="nav-link" href="{% url 'categorias_formulario' %}">Registrar categorias</a>
+                             <a class="nav-link" href="{% url 'categorias' %}">
+                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                 Listar categorias
+                             </a>
+                         </nav>
+                     </div>
                         <!--Clientes-->
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                             data-bs-target="#collapseClientes" aria-expanded="false" aria-controls="collapseClientes">
@@ -158,7 +176,7 @@
                             </nav>
                         </div>
                         <!--Seguridad-->
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                        <!-- <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                             data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-shield-halved"></i></div>
                             Seguridad
@@ -173,10 +191,10 @@
                                     Listar Usuarios
                                 </a>
                             </nav>
-                        </div>
+                        </div> -->
 
                         <!--Auditoria-->
-                        <a class="nav-link collapsed" href="auditoria.html">
+                        <a class="nav-link collapsed" href="{% url 'auditoria' %}">
                             <div class="sb-nav-link-icon"><i class="fa-brands fa-audible"></i></div>
                             Auditoria
                         </a>
@@ -209,7 +227,7 @@
         <div class="container-fluid px-4">
             <div class="d-flex align-items-center justify-content-center small">
                 <div class="grupo-2" style="text-align: center;">
-                    <small>&copy; 2023 <b>infinite cod</b> - Todos los Derechos Reservados</small>
+                    <small>&copy; 2023 <b>INFINITE CODE</b> - Todos los Derechos Reservados</small>
                 </div>
             </div>
         </div>
@@ -255,6 +273,7 @@
     {% endif %}
 
     {% block js %}
+    
     {% endblock %}
     
 </body>

@@ -33,6 +33,7 @@ urlpatterns = [
     path("logout/", views.logout, name="logout"),
     path("panelDeGestion/", views.panelDeGestion, name="panelDeGestion"),
     path("graficos/", views.graficos, name="graficos"),
+    path("auditoria/", views.auditoria, name="auditoria"),
 
     #Enviar correo
     path("enviarCorreo/", views.enviarCorreo, name="enviarCorreo"),

@@ -1,0 +1,30 @@
+{% extends "API/bases/baseAdmin.html" %}
+
+{% load static %}
+
+{% block contenido  %}
+<h1 class="mt-4 title-tablas">Auditoria</h1>
+
+<div class="container">
+    <button type="button" id="backup" class="btn btn btn-lg">
+        <i class="bi bi-file-arrow-up"></i> Generar backup de la base de datos
+    </button>
+    <button type="button" id="restablecer" class="btn btn btn-lg">
+        <i class="bi bi-arrow-clockwise"></i> Restablecer el backup de la base de datos
+    </button>
+    <button type="button" id="registrar" class="btn btn btn-lg">
+        <i class="bi bi-journal-plus"></i> Registrar log
+    </button>
+    <button type="button" id="informe" class="btn btn btn-lg">
+        <i class="bi bi-journal-text"></i> Generar informe de log
+    </button>
+</div>
+
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'API/demo/chart-pie-demo.js' %}"></script>
+{% endblock %}
