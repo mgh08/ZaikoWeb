@@ -988,6 +988,8 @@ class CustomAuthToken(ObtainAuthToken):
             }
         })
 
+def auditoria(request):
+    return render(request, 'API/auditoria/auditoria.html')
 
 class AlmacenViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

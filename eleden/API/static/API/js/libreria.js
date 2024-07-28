@@ -53,7 +53,7 @@ function verProducto(ruta) {
         quitarAlertas(); // Supongo que esta función quita las alertas después de cargar el contenido
     })
     .fail(function() {
-        alert("Error al cargar los datos del producto");
+        quitarAlertas();
     });
 }
 
