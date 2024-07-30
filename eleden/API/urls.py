@@ -28,9 +28,13 @@ urlpatterns = [
 
     #Login
     path("login/", views.login, name="login"),
+    path("logout/", views.logout, name="logout"),
     path("registrarse/", views.registrarse, name="registrarse"),
     path("recuperar_clave_form/", views.recuperar_clave_form, name="recuperar_clave_form"),
-    path("logout/", views.logout, name="logout"),
+    path("verificar_token_form/<str:correo>/", views.verificar_token_form, name="verificar_token_form"),
+	path("olvide_mi_clave/<str:correo>/", views.olvide_mi_clave, name="olvide_mi_clave"),
+    
+
     path("panelDeGestion/", views.panelDeGestion, name="panelDeGestion"),
     path("graficos/", views.graficos, name="graficos"),
     path("auditoria/", views.auditoria, name="auditoria"),

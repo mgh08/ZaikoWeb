@@ -84,7 +84,7 @@ def recuperar_clave_form(request):
             # envío de correo
             ruta = reverse(verificar_token_form, args=(q.correo,))
 
-            resultado = enviar_correo(ruta, q.correo, q.token)
+            resultado = enviarCorreo(ruta, q.correo, q.token)
             messages.info(request, resultado)
             return redirect("verificar_token_form", correo=q.correo)
         except Usuario.DoesNotExist:
@@ -112,6 +112,32 @@ def verificar_token_form(request, correo):
         contexto = {"correo": correo}
         return render(request, "inventario/login/verificar_token_form.html", contexto)
 
+def olvide_mi_clave(request, correo):
+	if request.method == "POST":
+		c_nueva1 = request.POST.get("nueva1")
+		c_nueva2 = request.POST.get("nueva2")
+
+		q = Usuario.objects.get(correo=correo)
+
+		if c_nueva1 == c_nueva2:
+			# modifico clave al usuario actual (al objeto)
+			clave = hash_password(c_nueva1)
+			q.clave = clave
+			# eliminar el token de db
+			q.token = ""
+			# guardo en base de datos
+			q.save()
+
+			messages.success(request, "Clave cambiada correctamente!!")
+			return redirect("index")
+		else:
+			messages.warning(request, "Claves nuevas no concuerdan...")
+
+		return redirect("olvide_mi_clave", correo=correo)
+	else:
+		contexto = {"correo": correo}
+		return render(request, "inventario/login/olvide_mi_clave.html", contexto)
+
 
 def logout(request):
     logueo = request.session.get("logueo", False)
@@ -130,6 +156,45 @@ def handle_uploaded_file(f):
     with open(f"{settings.MEDIA_ROOT}/fotos/{f.name}", "wb+") as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+
+def formulario_cambiar_clave(request):
+	logueo = request.session.get("logueo", False)
+
+	if logueo:
+		return render(request, "API/index/formulario_cambiar_clave.html")
+	else:
+		messages.info(request, "No tiene permisos para acceder al módulo...")
+		return redirect("index")
+
+
+def cambiar_clave(request):
+	if request.method == "POST":
+		# capturo la clave actual del formulario
+		c_actual = request.POST.get("actual")
+		c_nueva1 = request.POST.get("nueva1")
+		c_nueva2 = request.POST.get("nueva2")
+
+		# capturo variable de sesión para averiguar ID de usuario
+		logueo = request.session.get("logueo", False)
+		q = Usuario.objects.get(pk=logueo["id"])
+		verify = verify_password(c_actual, q.clave)
+		if verify:
+			if c_nueva1 == c_nueva2:
+				# modifico clave al usuario actual (al objeto)
+				clave = hash_password(c_nueva1)
+				q.clave = clave
+				# guardo en base de datos
+				q.save()
+				messages.success(request, "Clave cambiada correctamente!!")
+			else:
+				messages.warning(request, "Claves nuevas no concuerdan...")
+		else:
+			messages.error(request, "Clave actual no corresponde...")
+
+		return redirect("formulario_cambiar_clave")
+	else:
+		return HttpResponse("No se enviaron datos...")
 
 
 def panelDeGestion(request):

@@ -6,7 +6,7 @@
 {% block principal %}
 
 <div class="card mt-5 p-2 col-3 m-auto text-center">
-    <form action="{% url 'cambiar_clave' %}" method="post">
+    <form action="{% url 'recuperar_clave' %}" method="POST">
         {% csrf_token %}
         <label >Clave actual</label><br>
         <input type="password" required="" name="actual" autofocus="" class="form-control"><br>
