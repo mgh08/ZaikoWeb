@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
@@ -775,6 +775,137 @@ def buscar_categorias(request):
         return redirect("categorias")
 
 
+#Pedidos
+
+def pedidos(request, pk=None):
+    if pk:
+        registro = get_object_or_404(Pedido, pk=pk)
+    else:
+        registro = None
+
+    clientes = Cliente.objects.all()
+    productos = ProductoTerminado.objects.all()
+    
+    context = {
+        'registro': registro,
+        'clientes': clientes,
+        'productos': productos,
+    }
+    return render(request, 'pedidos_listar.html', context)
+
+def pedidos_listar(request):
+    q = Pedido.objects.all()
+    context = {"data": q}
+    return render(request, 'API/pedidos/pedidos_listar.html', context)
+
+def pedidos_formulario(request):
+    return render(request, "API/pedidos/pedidos_formulario.html")
+
+def pedidos_guardar(request):
+    if request.method == "POST":
+        cliente_nombre = request.POST.get("clientes")
+        cantidad = request.POST.get("cantidad")
+        precio_unitario = request.POST.get("precio_unitario")
+        fecha_pedido = request.POST.get("fecha_pedido")
+        producto_nombre = request.POST.get("productos")
+        
+        try:
+            cliente = Cliente.objects.get(nombre=cliente_nombre)
+        except Cliente.DoesNotExist:
+            messages.error(request, f"Cliente con nombre '{cliente_nombre}' no encontrado")
+            return redirect("pedidos_formulario")
+        
+        try:
+            producto = ProductoTerminado.objects.get(nombre=producto_nombre)
+        except ProductoTerminado.DoesNotExist:
+            messages.error(request, f"Producto con nombre '{producto_nombre}' no encontrado")
+            return redirect("pedidos_formulario")
+        
+        try:
+            cantidad = int(cantidad)
+            precio_unitario = float(precio_unitario)
+            precio_total = cantidad * precio_unitario
+            
+            pedido = Pedido(
+                clientes=cliente,
+                productos=producto,
+                cantidad=cantidad,
+                precio_unitario=precio_unitario,
+                precio_total=precio_total,
+                fecha_pedido=fecha_pedido
+            )
+            pedido.save()
+            messages.success(request, "Pedido guardado correctamente!!")
+            return redirect("pedidos_listar")
+        except Exception as e:
+            messages.error(request, f"Error al guardar el pedido: {e}")
+            return redirect("pedidos_formulario")
+    else:
+        messages.warning(request, "No se enviaron datos...")
+        return redirect("pedidos_formulario")
+
+
+def pedidos_formulario_editar(request, id):
+    pedido = get_object_or_404(Pedido, pk=id)
+    context = {"registro": pedido}
+    return render(request, "API/pedidos/pedidos_formulario.html", context)
+
+
+def pedidos_actualizar(request):
+    if request.method == "POST":
+        id = request.POST.get("id")
+        pedido = get_object_or_404(Pedido, pk=id)       
+        try:
+            cantidad = request.POST.get("cantidad")
+            precio_unitario = request.POST.get("precio_unitario")
+            fecha_pedido = request.POST.get("fecha_pedido")
+            nombre_cliente = request.POST.get("clientes")
+            nombre_producto = request.POST.get("productos")
+            
+            try:
+                cliente = Cliente.objects.get(nombre=nombre_cliente)
+            except Cliente.DoesNotExist:
+                messages.error(request, f"Cliente con nombre '{nombre_cliente}' no encontrado")
+                return redirect("pedidos_formulario")
+            
+            try:
+                producto = ProductoTerminado.objects.get(nombre=nombre_producto)
+            except ProductoTerminado.DoesNotExist:
+                messages.error(request, f"Producto con nombre '{nombre_producto}' no encontrado")
+                return redirect("pedidos_formulario")
+            
+            pedido.clientes = cliente
+            pedido.productos = producto
+            pedido.cantidad = int(cantidad)
+            pedido.precio_unitario = float(precio_unitario)
+            pedido.precio_total = pedido.cantidad * pedido.precio_unitario
+            pedido.fecha_pedido = fecha_pedido
+            pedido.save()
+            
+            messages.success(request, "Pedido actualizado correctamente!!")
+        except Exception as e:
+            messages.error(request, f"Error al actualizar el pedido: {e}")
+            return redirect("pedidos_formulario")
+        
+        return redirect("pedidos_listar")
+    else:
+        messages.warning(request, "No se enviaron datos...")
+        return redirect("pedidos_formulario")
+
+
+def pedidos_eliminar(request, id):
+    try:
+        q = Pedido.objects.get(id=id)
+        q.delete()
+        messages.success(request, f"Se ha eliminado correctamente {q.productos}")
+    except Exception as e:
+        messages.error(request, f"Error {e}")
+    return redirect("pedidos_listar")
+
+
+
+#---------------------------------------------
+
 def handle_uploaded_file(f):
     with open(f"{settings.MEDIA_ROOT}/fotos/{f.name}", "wb+") as destination:
         for chunk in f.chunks():
@@ -1133,11 +1264,11 @@ class RecetaViewSet(viewsets.ModelViewSet):
     serializer_class = RecetaSerializer
 
 
-class DetallePedidoViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = DetallePedido.objects.all()
-    serializer_class = DetallePedidoSerializer
+# class DetallePedidoViewSet(viewsets.ModelViewSet):
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     queryset = DetallePedido.objects.all()
+#     serializer_class = DetallePedidoSerializer
 
 
 class PedidoViewSet(viewsets.ModelViewSet):
