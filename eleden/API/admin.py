@@ -16,7 +16,7 @@ admin.site.register(MovimientoStock)
 admin.site.register(ProductoTerminado)
 admin.site.register(Proveedor)
 admin.site.register(Receta)
-admin.site.register(DetallePedido)
+#admin.site.register(DetallePedido)
 admin.site.register(Pedido)
 admin.site.register(Usuario)
 

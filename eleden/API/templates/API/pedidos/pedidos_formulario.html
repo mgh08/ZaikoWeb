@@ -1,0 +1,28 @@
+{% extends 'API/bases/baseAdmin.html' %}
+{% load static %}
+
+{% block contenido %}
+<section class="tablas tablas-formularios">
+    <form action="{% url 'pedidos_guardar' %}" method="post">
+        {% csrf_token %}
+        <div class="regresar">
+            <h1 class="title-tablas">Crear o actualizar Pedidos</h1>
+            <a class="btn-regresar" href="{% if registro %}{% url 'pedidos_actualizar' %}{% else %}{% url 'pedidos_guardar' %}{% endif %}"><i class="fa-solid fa-reply"></i></a>
+        </div>
+        <input type="hidden" name="id" value="{{ registro.id }}" >
+        <label>Cantidad: </label>
+    <input type="number" name="cantidad" class="form-control" value="{{ registro.cantidad }}"><br>
+    <label>Precio Unitario: </label>
+    <input type="text" name="precio_unitario" class="form-control" value="{{ registro.precio_unitario }}"><br>
+    <label>Productos: </label>
+    <input type="text" name="productos" class="form-control" value="{{ registro.productos.nombre }}"><br>
+    <label>Cliente: </label>
+    <input type="text" name="clientes" class="form-control" value="{{ registro.clientes.nombre }}"><br>
+    <label>Fecha Del Pedido: </label>
+    <input type="date" name="fecha_pedido" class="form-control" value="{{ registro.fecha_pedido }}"><br>
+        <br>
+        <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+    </form>
+    
+</section>
+{% endblock %}

@@ -60,10 +60,10 @@ class RecetaSerializer(serializers.ModelSerializer):
 		model = Receta
 		fields = '__all__'
 
-class DetallePedidoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = DetallePedido
-		fields = '__all__'
+# class DetallePedidoSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = DetallePedido
+# 		fields = '__all__'
 
 class PedidoSerializer(serializers.ModelSerializer):
 	class Meta:
