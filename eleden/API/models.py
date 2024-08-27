@@ -59,9 +59,9 @@ class Almacen(models.Model):
     ubicacion = models.CharField(max_length=255)
 
 
-class CategoriaProducto(models.Model):
-    nombre = models.CharField(max_length=255) 
-    ubicacion = models.CharField(max_length=255)
+# class CategoriaProducto(models.Model):
+#     nombre = models.CharField(max_length=255) 
+#     ubicacion = models.CharField(max_length=255)
 
 
 class CategoriaProducto(models.Model):
@@ -78,6 +78,9 @@ class Cliente(models.Model):
     contacto = models.CharField(max_length=255)
     correo_electronico = models.EmailField(null=True, blank=True)
     direccion = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.nombre}"
 
 
 class ProductoTerminado(models.Model):
@@ -142,17 +145,24 @@ class Receta(models.Model):
     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
 
 
+# class Pedido(models.Model):
+#     clientes = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+#     fecha_pedido = models.DateField()
+
+
+# class DetallePedido(models.Model):
+#     cantidad = models.IntegerField()
+#     precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+#     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
+#     pedidos = models.ForeignKey(Pedido, on_delete=models.DO_NOTHING)
+
 class Pedido(models.Model):
     clientes = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
-    fecha_pedido = models.DateField()
-
-
-class DetallePedido(models.Model):
-    cantidad = models.IntegerField()
-    precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-    pedidos = models.ForeignKey(Pedido, on_delete=models.DO_NOTHING)
-
+    cantidad = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    fecha_pedido = models.DateField()
 
 class AlertaStock(models.Model):
     materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)

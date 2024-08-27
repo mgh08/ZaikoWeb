@@ -195,6 +195,26 @@
                             </nav>
                         </div> -->
 
+                        <!--Pedidos-->
+
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapsePedidos" aria-expanded="false"
+                            aria-controls="collapsePedidos">
+                            <div class="sb-nav-link-icon"><i class="fa-solid fa-box-open"></i></div>
+                            Pedidos
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapsePedidos" aria-labelledby="headingOne"
+                            data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'pedidos_formulario' %}">Registrar Pedidos</a>
+                                <a class="nav-link" href="{% url 'pedidos_listar' %}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Listar Pedidos
+                                </a>
+                            </nav>
+                        </div>
+
                         <!--Auditoria-->
                         <a class="nav-link collapsed" href="{% url 'auditoria' %}">
                             <div class="sb-nav-link-icon"><i class="fa-brands fa-audible"></i></div>

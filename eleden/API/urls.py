@@ -17,7 +17,7 @@ router.register(r'MovimientoStock', views.MovimientoStockViewSet),
 router.register(r'ProductoTerminado', views.ProductoTerminadoViewSet),
 router.register(r'Proveedor', views.ProveedorViewSet),
 router.register(r'Receta', views.RecetaViewSet),
-router.register(r'DetallePedido', views.DetallePedidoViewSet),
+#router.register(r'DetallePedido', views.DetallePedidoViewSet),
 router.register(r'Pedido', views.PedidoViewSet),
 router.register(r'Usuario', views.UsuarioViewSet),
 router.register(r'ventaSoftware', views.ventaSoftwareViewSet),
@@ -114,8 +114,14 @@ urlpatterns = [
 	path("categorias_actualizar/", views.categorias_actualizar, name="categorias_actualizar"),
     path("buscar_categorias/", views.buscar_categorias, name="buscar_categorias"),
 
-
-  
+    #Pedidos
+    path("pedidos/", views.pedidos, name="pedidos"),
+    path("pedidos_formulario/", views.pedidos_formulario, name="pedidos_formulario"),
+    path("pedidos_guardar/", views.pedidos_guardar, name="pedidos_guardar"),
+    path("pedidos_listar/", views.pedidos_listar, name="pedidos_listar"),
+    path("pedidos_formulario_editar/<int:id>/", views.pedidos_formulario_editar, name="pedidos_formulario_editar"),
+	path("pedidos_actualizar/", views.pedidos_actualizar, name="pedidos_actualizar"),
+    path("pedidos_eliminar/<int:id>/",views.pedidos_eliminar,name="pedidos_eliminar"),
 
 
     #carrito
@@ -133,6 +139,7 @@ urlpatterns = [
     path("productos_editar_software/<int:id_producto>/", views.productos_editar_software, name='productos_editar_software'),
     path("productos_guardar_software", views.productos_guardar_software, name='productos_guardar_software'),
     path("productos_formulario_software", views.productos_formulario_software, name='productos_formulario_software'),
+    
     
 
 
