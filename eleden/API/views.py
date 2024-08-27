@@ -49,8 +49,7 @@ def login(request):
             q = Usuario.objects.get(usuario=usuario)
             verify = verify_password(clave, q.password)
             if verify:
-                messages.success(request, f"Bienvenido {q.nombreCompleto}")
-                # Crear la sesión......
+                # Guardar información en la sesión
                 request.session["logueo"] = {
                     "id": q.id,
                     "nombre": q.nombreCompleto,
@@ -59,46 +58,56 @@ def login(request):
                 request.session["carrito"] = []
                 request.session["items_carrito"] = 0
 
+                messages.success(request, f"Bienvenido {q.nombreCompleto}")
+
+                # Redirigir al usuario a la vista 'tienda'
                 return redirect("tienda")
             else:
-                raise Exception(verify)
+                messages.error(request, "Contraseña incorrecta.")
+                return redirect("index")
 
-        except Exception as e:
-            messages.error(request, f"Usuario o contraseña no válidos...{e} ")
+        except Usuario.DoesNotExist:
+            messages.error(request, "Usuario no encontrado.")
             return redirect("index")
+
     else:
-        messages.warning(request, "No se enviaron datos...")
+        messages.warning(request, "No se enviaron datos.")
         return redirect("index")
 
 
 def recuperar_clave_form(request):
     if request.method == "POST":
         try:
-            q = Usuario.objects.get(correo=request.POST.get("correo"))
+            # Obtén el usuario basado en su nombre de usuario
+            q = Usuario.objects.get(usuario=request.POST.get("correo"))  # Aquí se usa 'usuario' en lugar de 'email'
             num = randint(100000, 999999)
-            # convertir num a base64 para ocultarlo un poco
+
+            # Convertir num a base64 para ofuscarlo
             ofuscado = base64.b64encode(str(num).encode("ascii")).decode("ascii")
             q.token = ofuscado
             q.save()
 
-            # envío de correo
-            ruta = reverse(verificar_token_form, args=(q.correo,))
-
-            resultado = enviarCorreo(ruta, q.correo, q.token)
+            # Generar la ruta para verificar el token
+            ruta = request.build_absolute_uri(reverse("verificar_token_form", args=[q.usuario]))
+            
+            # Enviar el correo con el token
+            resultado = enviarCorreo(q.usuario, q.token, ruta)  # Cambia 'q.email' a 'q.usuario'
             messages.info(request, resultado)
-            return redirect("verificar_token_form", correo=q.correo)
+
+            return redirect("verificar_token_form", correo=q.usuario)
         except Usuario.DoesNotExist:
             messages.error(request, "Usuario no existe...")
-
-        return redirect("recuperar_clave_form")
+            return redirect("recuperar_clave_form")
     else:
-        return render(request, "inventario/login/recuperar_clave_form.html")
-
+        return render(request, "API/index/recuperar_clave_form.html")
 
 def verificar_token_form(request, correo):
     if request.method == "POST":
         try:
-            q = Usuario.objects.get(correo=correo)
+            # Buscar el usuario basado en el campo 'usuario'
+            q = Usuario.objects.get(usuario=correo)
+            
+            # Verificar que el token coincida y no esté vacío
             if q.token != "" and q.token == request.POST.get("token"):
                 messages.success(request, "Token OK, cambie su clave!!")
                 return redirect("olvide_mi_clave", correo=correo)
@@ -109,20 +118,22 @@ def verificar_token_form(request, correo):
 
         return redirect("verificar_token_form", correo=correo)
     else:
-        contexto = {"correo": correo}
-        return render(request, "inventario/login/verificar_token_form.html", contexto)
+        contexto = {"usuario": correo}
+        return render(request, "API/index/verificar_token_form.html", contexto)
+ 
+
 
 def olvide_mi_clave(request, correo):
 	if request.method == "POST":
 		c_nueva1 = request.POST.get("nueva1")
 		c_nueva2 = request.POST.get("nueva2")
 
-		q = Usuario.objects.get(correo=correo)
+		q = Usuario.objects.get(usuario=correo)
 
 		if c_nueva1 == c_nueva2:
 			# modifico clave al usuario actual (al objeto)
 			clave = hash_password(c_nueva1)
-			q.clave = clave
+			q.password = clave
 			# eliminar el token de db
 			q.token = ""
 			# guardo en base de datos
@@ -136,7 +147,7 @@ def olvide_mi_clave(request, correo):
 		return redirect("olvide_mi_clave", correo=correo)
 	else:
 		contexto = {"correo": correo}
-		return render(request, "inventario/login/olvide_mi_clave.html", contexto)
+		return render(request, "API/index/olvide_mi_clave.html", contexto)
 
 
 def logout(request):
@@ -159,7 +170,7 @@ def handle_uploaded_file(f):
 
 
 def formulario_cambiar_clave(request):
-	logueo = request.session.get("logueo", False)
+	logueo = request.session.get("logueo", True)
 
 	if logueo:
 		return render(request, "API/index/formulario_cambiar_clave.html")
@@ -657,31 +668,31 @@ def productos_formulario_editar(request, id):
 
 # R
 
-def enviarCorreo(request):
-    if request.method == "POST":
-        name = request.POST["name"]
-        email = request.POST["email"]
-        subject = request.POST["subject"]
-        message = request.POST["message"]
+def enviarCorreo(usuario, token, ruta):
+    # Aquí se define el asunto del correo
+    subject = "Recuperación de contraseña"
 
-        template = render_to_string('API/email/email_template.html', {
-            'name': name,
-            'email': email,
-            'message': message
-        })
+    # Renderizamos la plantilla del correo con la información del usuario, token y ruta
+    template = render_to_string('API/email/email_template.html', {
+        'usuario': usuario,
+        'token': token,
+        'ruta': ruta
+    })
 
-        email = EmailMessage(
-            subject,
-            template,
-            settings.EMAIL_HOST_USER,
-            ['juanr7788@gmail.com']
-        )
+    # Configuramos el correo electrónico
+    email = EmailMessage(
+        subject,
+        template,
+        settings.EMAIL_HOST_USER,
+        [usuario]  # Aquí usamos el email del usuario
+    )
 
-        email.fail_silently = False
-        email.send()
+    # Enviamos el correo
+    email.fail_silently = False
+    email.send()
+    
+    return "Correo enviado exitosamente"
 
-        messages.success(request, 'Se ha enviado tu solicitud.')
-        return redirect('index')
 
     # destinatario = "jor.sincelejo@gmail.com"
     # mensaje = """

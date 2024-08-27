@@ -70,11 +70,13 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading">Tienda</div>
-
+                        
+                        {% if request.session.logueo.rol == "ADMIN" %}
                         <a class="nav-link" href="{% url 'productos_listar_software' %}">
                             <div class="sb-nav-link-icon"><i class="fa-solid fa-pen-to-square"></i></div>
-                            editar software
+                            Editar software
                         </a>
+                        {% endif %}
                         
                         <a class="nav-link" href="{% url 'tienda' %}">
                             <div class="sb-nav-link-icon"><i class="fa-brands fa-shopify"></i></div>

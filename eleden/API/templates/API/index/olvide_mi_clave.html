@@ -1,12 +1,11 @@
-{% extends 'inventario/base2.html' %}
+
+{% extends 'API/bases/baseIndex.html' %}
 {% load static %}
 
-{% block titulo %}Cambiar contraseña{% endblock %}
+{% block contenido %}
 
-{% block principal %}
-
-<div class="card mt-5 p-2 col-3 m-auto text-center">
-    <form action="{% url 'olvide_mi_clave' correo %}" method="post">
+<div class="card mt-5 p-5 col-3 m-auto text-center">
+    <form action="{% url 'olvide_mi_clave' correo=correo %}" method="post">
         {% csrf_token %}
         <label>Nueva Clave</label><br>
         <input type="password" required="" name="nueva1" class="form-control">
