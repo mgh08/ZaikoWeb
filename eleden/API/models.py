@@ -24,8 +24,7 @@ class Usuario(AbstractUser):
     password = models.CharField(max_length=254)
     ROLES = (
         ("ADMIN", "Administrador"),
-        ("SECRE", "Secretaria"),
-        ("VENDE", "Vendedor"),
+        ("GEREN", "Gerente"),
         ("USUAR", "Usuario"),
     )
 
