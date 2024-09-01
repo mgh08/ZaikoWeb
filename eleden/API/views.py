@@ -156,7 +156,7 @@ def logout(request):
         del request.session["logueo"]
         # del request.session["carrito"]
         # del request.session["items_carrito"]
-        messages.info(request, "Sesion cerrada correctamente")
+        messages.success(request, "Sesion cerrada correctamente")
         return redirect("index")
     else:
         messages.info(request, "No se pudo cerrar sesión, intente de nuevo")
