@@ -4,15 +4,18 @@
 
 {% block contenido %}
 
-<div class="card mt-5 p-5 col-3 m-auto text-center">
-    <form action="{% url 'olvide_mi_clave' correo=correo %}" method="post">
-        {% csrf_token %}
-        <label>Nueva Clave</label><br>
-        <input type="password" required="" name="nueva1" class="form-control">
-        <label>Repetir Clave</label><br>
-        <input type="password" required="" name="nueva2" class="form-control"><br>
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-5 col-3 text-center">
+        <form action="{% url 'olvide_mi_clave' correo=correo %}" method="post">
+            {% csrf_token %}
+            <label>Nueva Clave</label><br>
+            <input type="password" required="" name="nueva1" class="form-control">
+            <label>Repetir Clave</label><br>
+            <input type="password" required="" name="nueva2" class="form-control"><br>
 
-        <button type="submit" class="btn btn-info">Guardar</button>
-    </form>
+            <button type="submit" class="btn btn-info mt-3">Guardar</button>
+        </form>
+    </div>
 </div>
+
 {% endblock %}
