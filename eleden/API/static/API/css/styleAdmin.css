@@ -655,7 +655,7 @@ progress {
 .container-sm {
   --bs-gutter-x: 1.5rem;
   --bs-gutter-y: 0;
-  width: 100vh;
+  width: 100%;
   padding-right: calc(var(--bs-gutter-x) * 0.5);
   padding-left: calc(var(--bs-gutter-x) * 0.5);
   margin-right: auto;
@@ -11282,14 +11282,45 @@ body{
 }
 
 .tablas{
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  width: 100vh;
-  margin-top: 30px;
+  width: 100%;
+  margin: auto;
 }
 
 .btn-tablas{
-  width: 80px;
+  width: 75px;
+  margin-bottom: 20px;
+}
+
+/* .tablas.fade-out {
+  opacity: 0;
+  transition: opacity 0.1s;
+} */
+
+.regresar{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.btn-regresar{
+  margin-top: 20px;
+  margin-right: 10px;
+  font-size: 2rem;
+  color: #0dcaf0 ;
+  transition: all 200ms ease;
+}
+
+.btn-regresar:hover{
+  color: #0892b2;
+}
+
+.title-tablas{
+  margin-top: 20px;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
 }
 
 #datatablesSimple{
