@@ -14,17 +14,17 @@
   margin-top: 20px;
 }
 #backup {
-  background: linear-gradient(#0d323f, #1d5b6d);
+  background: linear-gradient(#32c9de, #91e9f2);
   margin-bottom: 20px;
   width: 100%;
 }
 #restablecer {
-  background: linear-gradient(#1d5b6d, #158ba5);
+  background: linear-gradient(#32c9de, #91e9f2);
   margin-bottom: 20px;
   width: 100%;
 }
 #registrar {
-  background: linear-gradient(#158ba5, #32c9de);
+  background: linear-gradient(#32c9de, #91e9f2);
   margin-bottom: 20px;
   width: 100%;
 }
