@@ -3,12 +3,18 @@
 {% load static %}
 
 {% block contenido %}
-    <div class="col-3 d-flex card p-5 m-auto mt-3">
-    <form action="{% url 'recuperar_clave_form' %}" method="post">
-        {% csrf_token %}
-        <label for="c">Digite su correo:</label>
-        <input id="c" type="email" name="correo" class="form-control" required/>
-        <button type="submit" class="btn btn-primary">Enviar</button>
-    </form>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col-3 card p-5">
+        <form action="{% url 'recuperar_clave_form' %}" method="post">
+            {% csrf_token %}
+            <label for="c">Digite su correo:</label>
+            <br>
+            <input id="c" type="email" name="correo" class="form-control" required/>
+            <br>
+            <button type="submit" class="btn btn-primary mt-3">Enviar</button>
+        </form>
     </div>
+</div>
+
 {% endblock %}
