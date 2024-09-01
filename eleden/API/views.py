@@ -579,7 +579,7 @@ def buscar_productos(request):
         contexto = {"data": q}
         return render(request, "API/productos/productoTerminado.html", contexto)
     else:
-        messages.warning(request, "No se enviaron datos...")
+        # messages.warning(request, "No se enviaron datos...")
         return redirect("productoTerminado")
 
 
