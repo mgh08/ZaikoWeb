@@ -9,7 +9,9 @@
     <br>
     <div class="tablas-formularios table-responsive" >
         <h1 class="title-tablas">Productos</h1>
-        <a class="btn btn-success btn-tablas" type="button" href="{% url 'registrar_producto' %}"><i class="fa-solid fa-plus"></i></a>
+        {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+            <a class="btn btn-success btn-tablas" type="button" href="{% url 'registrar_producto' %}"><i class="fa-solid fa-plus"></i></a>
+        {% endif %}
         <div class="mt-2"></div>
         <table class="table" id="datatablesSimple">
             <thead>
@@ -23,6 +25,9 @@
                     <th>Lote</th>
                     <th>Fecha de Vencimiento</th>
                     <th>Precio</th>
+                    {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                        <th>Acciones</th>
+                    {% endif %}
                 </tr>
             </thead>
         <tbody>    
@@ -43,19 +48,21 @@
                 <td>{{ r.lote }}</td>
                 <td>{{ r.fecha_vencimiento }}</td>
                 <td>{{ r.precio }}</td>
-                <td>
-                    <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Acciones">
-                        <a class="btn btn-warning" href="{% url 'productos_formulario_editar' r.id %}">Editar</a>
-                        <!--<a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#verProducto" href="#">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>-->
-                        <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'productos_eliminar' r.id %}`)">
-                            <i class="fa-solid fa-trash"></i>
-                        </a>
-                    </div>
+                {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                    <td>
+                        <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Acciones">
+                            <a class="btn btn-warning" href="{% url 'productos_formulario_editar' r.id %}">Editar</a>
+                            <!--<a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#verProducto" href="#">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>-->
+                            <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'productos_eliminar' r.id %}`)">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </div>
 
-                    </tr>
-                {% endfor %}
+                    </td>
+                {% endif %}
+            {% endfor %}
                 </table>
 
                 <nav aria-label="...">

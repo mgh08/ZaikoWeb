@@ -1,0 +1,47 @@
+{% extends "API/bases/baseIndex.html" %}
+
+{% load static %}
+
+{% block contenido %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<p>{{ message }}</p>
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-5 col-3 text-center" style="background-color: azul;">
+        <div class="card-header" style="background-color: azul;">
+            <p>{{ message }}</p>
+
+            <p style="color: red">Debes inicar sesion para poder continuar... </p>
+            <form class="form form-register" action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <br>
+                <div>
+                    <label>
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" placeholder="Nombre Usuario" name="usuario"
+                            autocomplete="off">
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" placeholder="Contraseña" name="clave"
+                            autocomplete="off">
+                    </label>
+                </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                    <br>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -56,21 +56,18 @@
         <a class="registrar" data-bs-toggle="modal" data-bs-target="#register">Registrate</a>
         <a type="button" data-bs-toggle="modal" data-bs-target="#login"><i class="fa-solid fa-user"></i></a>
     </div>
-    <div>
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{% if message.tags and message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
-                     role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
+    
 
 </header>
 
 <main>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
     {% block contenido %}
 
@@ -129,6 +126,22 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+
+<div>
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                Swal.fire({
+                title: "{% if message.tags and message.tags == 'error' %}Error{% else %}{{ message.tags }}{% endif %}",
+                text: "{{ message }}",
+                icon: "{% if message.tags and message.tags == 'error' %}error{% elif message.tags and message.tags == 'warning' %}warning{% elif message.tags and message.tags == 'info' %}info{% else %}success{% endif %}",
+                confirmButtonText: 'OK'
+            });
+            </script>
+        {% endfor %}
+    {% endif %}
+</div>
+    
 {% block js %}
 
 {% endblock %}
