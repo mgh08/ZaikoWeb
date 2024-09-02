@@ -1,4 +1,5 @@
-from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 class LoginRequiredMiddleware:
@@ -59,9 +60,9 @@ class LoginRequiredMiddleware:
             reverse('productos_formulario_software')
 
         ]
-
         if request.path in rutas_protegidas and not request.session.get('logueo'):
-            return redirect('login')
+            # Redirigir al usuario con un mensaje personalizado
+            return render(request, 'API/index/login.html', {"mensaje": "Acceso denegado. Debes iniciar sesión para acceder a esta página."})
 
         response = self.get_response(request)
         return response
