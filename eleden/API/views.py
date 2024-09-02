@@ -458,7 +458,7 @@ def proveedores_actualizar(request):
         p.correo_electronico = request.POST.get("correo_electronico")
         p.save()
         messages.success(request, f"Se ha actualizado correctamente {p.nombre}")
-
+            
     except Exception as e:
         messages.error(request, f"Error {e}")
         return redirect("listarProveedores")
@@ -1164,6 +1164,17 @@ def tienda(request):
         return render(request, 'API/carrito/tienda.html', contexto)
     else:
         return redirect("index")
+    
+from django.shortcuts import render
+
+def custom_404(request, exception):
+    return render(request, 'API/errors/404.html', status=404)
+
+from django.shortcuts import redirect
+
+def custom_404(request, exception):
+    messages.error(request, 'La página que estás buscando no existe. Te hemos redirigido al inicio.')
+    return redirect('index')
 
 
 # ------------------------------- Para los permisos de los end-points -----------------------------

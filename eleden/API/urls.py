@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
 from rest_framework.authtoken.views import obtain_auth_token
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
 from . import views
 
 router = DefaultRouter()
@@ -21,6 +22,14 @@ router.register(r'Receta', views.RecetaViewSet),
 router.register(r'Pedido', views.PedidoViewSet),
 router.register(r'Usuario', views.UsuarioViewSet),
 router.register(r'ventaSoftware', views.ventaSoftwareViewSet),
+
+from django.conf.urls import handler404
+from . import views
+
+handler404 = 'API.views.custom_404'
+
+# Tus otras rutas
+
 
 urlpatterns = [
     path('', views.index, name='index'),
