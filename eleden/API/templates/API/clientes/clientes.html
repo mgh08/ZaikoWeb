@@ -9,7 +9,9 @@
         {% csrf_token %}
         <div class="tablas-formularios">
             <h1 class="title-tablas">Clientes</h1>
-            <a class="btn btn-success btn-tablas" href="{% url 'clientes_formulario' %}"><i class="fa-solid fa-plus"></i></a>
+            {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                <a class="btn btn-success btn-tablas" href="{% url 'clientes_formulario' %}"><i class="fa-solid fa-plus"></i></a>
+            {% endif %}
             <table class="table" id="datatablesSimple">
                 <thead>
                     <tr>
@@ -17,7 +19,9 @@
                         <th>Nombre</th>
                         <th>Contacto</th>
                         <th>Correo</th>
-                        <th>Acciones</th>
+                        {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                            <th>Acciones</th>
+                        {% endif %}
                     </tr>
                 </thead>
             <tbody>
@@ -27,10 +31,12 @@
                     <td>{{ r.nombre }}</td>
                     <td>{{ r.contacto }}</td>
                     <td>{{ r.correo_electronico }}</td>
-                     <td>
-                        <a class="btn btn-warning" href="{% url 'clientes_formulario_editar' r.id %}">Editar</a>
-                        <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'clientes_eliminar' r.id %}`)">Eliminar</a>
-                    </td>
+                    {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                        <td>
+                            <a class="btn btn-warning" href="{% url 'clientes_formulario_editar' r.id %}">Editar</a>
+                            <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'clientes_eliminar' r.id %}`)">Eliminar</a>
+                        </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
                 </table>

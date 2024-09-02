@@ -8,7 +8,9 @@
     {% csrf_token %}
     <div class="tablas-formularios">
         <h1 class="title-tablas">Proveedores</h1>
-        <a class="btn btn-success btn-tablas" href="{% url 'registrarProveedores' %}"><i class="fa-solid fa-plus"></i></a>
+        {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+            <a class="btn btn-success btn-tablas" href="{% url 'registrarProveedores' %}"><i class="fa-solid fa-plus"></i></a>
+        {% endif %}
         <table class="table" id="datatablesSimple">
             <thead>
                 <tr>
@@ -17,7 +19,9 @@
                     <th>nit</th>
                     <th>Contacto</th>
                     <th>Correo</th>
-                    <th>Acciones</th>
+                    {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                        <th>Acciones</th>
+                    {% endif %}
                 </tr>
             </thead>    
         
@@ -29,10 +33,12 @@
                 <td>{{ r.nit }}</td>
                 <td>{{ r.telefono }}</td>
                 <td>{{ r.correo_electronico }}</td>
-                <td>
-                    <a class="btn btn-warning" href="{% url 'proveedores_editar' r.id %}">Editar</a>
-                    <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'proveedores_eliminar' r.id %}`)">Eliminar</a>
-                </td>
+                {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                    <td>
+                        <a class="btn btn-warning" href="{% url 'proveedores_editar' r.id %}">Editar</a>
+                        <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'proveedores_eliminar' r.id %}`)">Eliminar</a>
+                    </td>
+                {% endif %}
             </tr>
             {% endfor %}
             </table>

@@ -32,6 +32,13 @@
                         class="fas fa-search"></i></button>
             </div>
         </form>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 
         <!-- Menu desplegable-->
         <ul class="d-flex navbar-nav">
@@ -99,7 +106,9 @@
                         <div class="collapse" id="collapseProveedores" aria-labelledby="headingOne"
                             data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="{% url 'registrarProveedores' %}">Registrar Proveedores</a>
+                                {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                                    <a class="nav-link" href="{% url 'registrarProveedores' %}">Registrar Proveedores</a>
+                                {% endif %}
                                 <a class="nav-link" href="{% url 'listarProveedores' %}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                     Listar Proveedores
@@ -117,7 +126,9 @@
                         <div class="collapse" id="collapseInventario" aria-labelledby="headingOne"
                             data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="{% url 'registrar_producto' %}">Registrar Productos</a>
+                                {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                                    <a class="nav-link" href="{% url 'registrar_producto' %}">Registrar Productos</a>
+                                {% endif %}
                                 <a class="nav-link" href="{% url 'buscar_productos' %}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                     Listar Productos
@@ -135,11 +146,13 @@
                      <div class="collapse" id="collapseCategorias" aria-labelledby="headingOne"
                          data-bs-parent="#sidenavAccordion">
                          <nav class="sb-sidenav-menu-nested nav">
-                             <a class="nav-link" href="{% url 'categorias_formulario' %}">Registrar categorias</a>
-                             <a class="nav-link" href="{% url 'categorias' %}">
-                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                 Listar categorias
-                             </a>
+                            {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                               <a class="nav-link" href="{% url 'categorias_formulario' %}">Registrar categorias</a>
+                            {% endif %}
+                            <a class="nav-link" href="{% url 'categorias' %}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Listar categorias
+                            </a>
                          </nav>
                      </div>
                         <!--Clientes-->
@@ -152,7 +165,9 @@
                         <div class="collapse" id="collapseClientes" aria-labelledby="headingOne"
                             data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="{% url 'clientes_formulario' %}">Registrar Clientes</a>
+                                {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                                    <a class="nav-link" href="{% url 'clientes_formulario' %}">Registrar Clientes</a>
+                                {% endif %}
                                 <a class="nav-link" href="{% url 'clientes' %}">
                                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                     Listar Clientes
@@ -216,10 +231,12 @@
                         </div>
 
                         <!--Auditoria-->
-                        <a class="nav-link collapsed" href="{% url 'auditoria' %}">
-                            <div class="sb-nav-link-icon"><i class="fa-brands fa-audible"></i></div>
-                            Auditoria
-                        </a>
+                        {% if request.session.logueo.rol == "ADMIN" or request.session.logueo.rol == "GEREN" %}
+                            <a class="nav-link collapsed" href="{% url 'auditoria' %}">
+                                <div class="sb-nav-link-icon"><i class="fa-brands fa-audible"></i></div>
+                                Auditoria
+                            </a>
+                        {% endif %}
 
 
                         <!--Addons-->
