@@ -495,50 +495,50 @@ def resgistrarMateriaPrima(request):
         return redirect("registrarMateriaPrima")
 
 
-def registrarMateriaPrima(request):
-    q = MateriaPrima.objects.all()
-    context = {"data": q}
-    return render(request, "API/materiaPrima/registrarMateriaPrima.html", context)
+# def registrarMateriaPrima(request):
+#     q = MateriaPrima.objects.all()
+#     context = {"data": q}
+#     return render(request, "API/materiaPrima/registrarMateriaPrima.html", context)
 
 
-def materiaPrima(request):
-    q = MateriaPrima.objects.all()
-    context = {"data": q}
-    return render(request, 'API/materiaPrima/materiaPrima.html', context)
+# def materiaPrima(request):
+#     q = MateriaPrima.objects.all()
+#     context = {"data": q}
+#     return render(request, 'API/materiaPrima/materiaPrima.html', context)
 
 
-def materia_prima_editar(request, id):
-    q = MateriaPrima.objects.get(id=id)
-    context = {"registro": q}
-    return render(request, "API/materiaPrima/registrarMateriaPrima.html", context)
+# def materia_prima_editar(request, id):
+#     q = MateriaPrima.objects.get(id=id)
+#     context = {"registro": q}
+#     return render(request, "API/materiaPrima/registrarMateriaPrima.html", context)
 
 
-def materia_prima_actualizar(request):
-    m = MateriaPrima.objects.get(pk=request.POST.get("id"))
-    try:
-        m.nombre = request.POST.get("nombre")
-        m.Proveedor = request.POST.get("proveedores")
-        m.unidad_medida = request.POST.get("unidad_medida")
-        m.cantidad = request.POST.get("cantidad")
-        m.fecha_vencimiento = request.POST.get("fecha_vencimiento")
-        m.foto = request.FILES.get("foto")
-        m.ultima_actualizacion = request.POST.get("ultima_actualizacion")
-        m.save()
-        messages.success(request, f"Se ha actualizado correctamente {m.nombre}")
-    except Exception as e:
-        messages.error(request, f"Error {e}")
-        return redirect("materiaPrima")
-    return redirect("materiaPrima")
+# def materia_prima_actualizar(request):
+#     m = MateriaPrima.objects.get(pk=request.POST.get("id"))
+#     try:
+#         m.nombre = request.POST.get("nombre")
+#         m.Proveedor = request.POST.get("proveedores")
+#         m.unidad_medida = request.POST.get("unidad_medida")
+#         m.cantidad = request.POST.get("cantidad")
+#         m.fecha_vencimiento = request.POST.get("fecha_vencimiento")
+#         m.foto = request.FILES.get("foto")
+#         m.ultima_actualizacion = request.POST.get("ultima_actualizacion")
+#         m.save()
+#         messages.success(request, f"Se ha actualizado correctamente {m.nombre}")
+#     except Exception as e:
+#         messages.error(request, f"Error {e}")
+#         return redirect("materiaPrima")
+#     return redirect("materiaPrima")
 
 
-def materia_prima_eliminar(request, id):
-    try:
-        q = MateriaPrima.objects.get(id=id)
-        q.delete()
-        messages.success(request, f"Se ha eliminado correctamente {q.nombre}")
-    except Exception as e:
-        messages.error(request, f"Error {e}")
-    return redirect("materiaPrima")
+# def materia_prima_eliminar(request, id):
+#     try:
+#         q = MateriaPrima.objects.get(id=id)
+#         q.delete()
+#         messages.success(request, f"Se ha eliminado correctamente {q.nombre}")
+#     except Exception as e:
+#         messages.error(request, f"Error {e}")
+#     return redirect("materiaPrima")
 
 
 # miguel
@@ -660,13 +660,6 @@ def productos_formulario_editar(request, id):
     return render(request, "API/productos/registrar_producto.html", contexto)
 
 
-# def productos_formulario_editar(request, id):
-#     q = ProductoTerminado.objects.get(pk=id)
-#     datos = {"registro": q}
-#     return render(request, "API/productos/registrar_producto.html", datos)
-
-
-# R
 
 def enviarCorreo(usuario, token, ruta):
     # Aquí se define el asunto del correo
@@ -693,27 +686,6 @@ def enviarCorreo(usuario, token, ruta):
     
     return "Correo enviado exitosamente"
 
-
-    # destinatario = "jor.sincelejo@gmail.com"
-    # mensaje = """
-
-
-# 		<h1 style='color:blue;'>Tienda virtual</h1>
-# 		<p>Su pedido está listo y en estado "creado".</p>
-# 		<p>Tienda ADSO, 2024</p>
-# 		<br>
-# 		<a href='http://127.0.0.1:8000/inventario/'>Recuperar contraseña </a>
-# 		"""
-
-# try:
-#     msg = EmailMessage("Tienda ADSO", mensaje, settings.EMAIL_HOST_USER, [destinatario])
-#     msg.content_subtype = "html"  # Habilitar contenido html
-#     msg.send()
-#     return HttpResponse("Correo enviado")
-# except BadHeaderError:
-#     return HttpResponse("Encabezado no válido")
-# except Exception as e:
-#     return HttpResponse(f"Error: {e}")
 
 
 # categorias
@@ -1215,12 +1187,11 @@ class AlmacenViewSet(viewsets.ModelViewSet):
     queryset = Almacen.objects.all()
     serializer_class = AlmacenSerializer
 
-
-class AlertaStockViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = AlertaStock.objects.all()
-    serializer_class = AlertaStockSerializer
+# class AlertaStockViewSet(viewsets.ModelViewSet):
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     queryset = AlertaStock.objects.all()
+#     serializer_class = AlertaStockSerializer
 
 
 class CategoriaProductoViewSet(viewsets.ModelViewSet):
@@ -1244,18 +1215,18 @@ class DevolucionViewSet(viewsets.ModelViewSet):
     serializer_class = DevolucionSerializer
 
 
-class MateriaPrimaViewSet(viewsets.ModelViewSet):
-    # authentication_classes = [TokenAuthentication, SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-    queryset = MateriaPrima.objects.all()
-    serializer_class = MateriaPrimaSerializer
+# class MateriaPrimaViewSet(viewsets.ModelViewSet):
+#     # authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     # permission_classes = [IsAuthenticated]
+#     queryset = MateriaPrima.objects.all()
+#     serializer_class = MateriaPrimaSerializer
 
 
-class MovimientoStockViewSet(viewsets.ModelViewSet):
-    # authentication_classes = [TokenAuthentication, SessionAuthentication]
-    # permission_classes = [IsAuthenticated]
-    queryset = MovimientoStock.objects.all()
-    serializer_class = MovimientoStockSerializer
+# class MovimientoStockViewSet(viewsets.ModelViewSet):
+#     # authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     # permission_classes = [IsAuthenticated]
+#     queryset = MovimientoStock.objects.all()
+#     serializer_class = MovimientoStockSerializer
 
 
 class ProductoTerminadoViewSet(viewsets.ModelViewSet):
@@ -1279,11 +1250,11 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioSerializer
 
 
-class RecetaViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = Receta.objects.all()
-    serializer_class = RecetaSerializer
+# class RecetaViewSet(viewsets.ModelViewSet):
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     queryset = Receta.objects.all()
+#     serializer_class = RecetaSerializer
 
 
 # class DetallePedidoViewSet(viewsets.ModelViewSet):
@@ -1294,17 +1265,17 @@ class RecetaViewSet(viewsets.ModelViewSet):
 
 
 class PedidoViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # permission_classes = [IsAuthenticated]
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
 
 
-class AlertaStockViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = AlertaStock.objects.all()
-    serializer_class = AlertaStockSerializer
+# class AlertaStockViewSet(viewsets.ModelViewSet):
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     queryset = AlertaStock.objects.all()
+#     serializer_class = AlertaStockSerializer
 
 
 class ventaSoftwareViewSet(viewsets.ModelViewSet):
