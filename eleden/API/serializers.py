@@ -6,12 +6,12 @@ from rest_framework import serializers
 	#class Meta:
 		#model = Pelicula
 		# fields = ['id', 'titulo', 'imagen', 'estreno', 'resumen']
-		#fields = '__all__'
+# 		#fields = '__all__'
 
-class AlertaStockSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = AlertaStock
-		fields = '__all__'
+# class AlertaStockSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = AlertaStock
+# 		fields = '__all__'
 
 class AlmacenSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -34,15 +34,15 @@ class DevolucionSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 
-class MateriaPrimaSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = MateriaPrima
-		fields = '__all__'
+# class MateriaPrimaSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = MateriaPrima
+# 		fields = '__all__'
 
-class MovimientoStockSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = MovimientoStock
-		fields = '__all__'
+# class MovimientoStockSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = MovimientoStock
+# 		fields = '__all__'
 
 class ProductoTerminadoSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -55,10 +55,10 @@ class ProveedorSerializer(serializers.ModelSerializer):
 		fields = '__all__'		
 
 
-class RecetaSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Receta
-		fields = '__all__'
+# class RecetaSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = Receta
+# 		fields = '__all__'
 
 # class DetallePedidoSerializer(serializers.ModelSerializer):
 # 	class Meta:

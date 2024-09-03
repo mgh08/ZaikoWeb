@@ -97,14 +97,21 @@ class ProductoTerminado(models.Model):
         return self.nombre
 
 
-
+class Pedido(models.Model):
+    clientes = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+    productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
+    cantidad = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    fecha_pedido = models.DateField()
+    
 
 class Devolucion(models.Model):
     fecha_devolucion = models.DateTimeField(auto_now_add=True)
     motivo = models.CharField(max_length=255, null=True, blank=True)
     foto = models.ImageField(default='fotos/default.png', upload_to='fotos/fotos_productos/')
     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-
+    
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=255)
@@ -115,57 +122,38 @@ class Proveedor(models.Model):
     def __str__(self):
         return self.nombre
 
-class MateriaPrima(models.Model):
-    nombre = models.CharField(max_length=255)
-    proveedores = models.ForeignKey(Proveedor, on_delete=models.DO_NOTHING)
-    unidad_medida = models.CharField(max_length=50)
-    cantidad = models.IntegerField()
-    fecha_vencimiento = models.DateField(null=True, blank=True)
-    foto = models.ImageField(default=None, upload_to='fotos/fotos_productos/')
-    ultima_actualizacion = models.DateTimeField(auto_now=True)
-
-
-class MovimientoStock(models.Model):
-    fecha_movimiento = models.DateTimeField(auto_now_add=True)
-    cantidad_movida = models.IntegerField()
-    estados = (
-        ("1", "Entrada"),
-        ("2", "Salida"),
-        ("3", "Bodega"),
-    )
-    estado = models.CharField(max_length=5, choices=estados, default="1", null=True, blank=True)
-    productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-    almacenes = models.ForeignKey(Almacen, on_delete=models.DO_NOTHING)
-    materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)
-
-
-class Receta(models.Model):
-    cantidad_usada = models.IntegerField(null=True, blank=True)
-    materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)
-    productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-
-
-# class Pedido(models.Model):
-#     clientes = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
-#     fecha_pedido = models.DateField()
-
-
-# class DetallePedido(models.Model):
+# class MateriaPrima(models.Model):
+#     nombre = models.CharField(max_length=255)
+#     proveedores = models.ForeignKey(Proveedor, on_delete=models.DO_NOTHING)
+#     unidad_medida = models.CharField(max_length=50)
 #     cantidad = models.IntegerField()
-#     precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+#     fecha_vencimiento = models.DateField(null=True, blank=True)
+#     foto = models.ImageField(default=None, upload_to='fotos/fotos_productos/')
+#     ultima_actualizacion = models.DateTimeField(auto_now=True)
+
+
+# class MovimientoStock(models.Model):
+#     fecha_movimiento = models.DateTimeField(auto_now_add=True)
+#     cantidad_movida = models.IntegerField()
+#     estados = (
+#         ("1", "Entrada"),
+#         ("2", "Salida"),
+#         ("3", "Bodega"),
+#     )
+#     estado = models.CharField(max_length=5, choices=estados, default="1", null=True, blank=True)
 #     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-#     pedidos = models.ForeignKey(Pedido, on_delete=models.DO_NOTHING)
+#     almacenes = models.ForeignKey(Almacen, on_delete=models.DO_NOTHING)
+#     materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)
 
-class Pedido(models.Model):
-    clientes = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
-    productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-    cantidad = models.IntegerField()
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    fecha_pedido = models.DateField()
 
-class AlertaStock(models.Model):
-    materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)
-    productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-    Nivel_Minimo = models.IntegerField()
-    fecha_vencimiento = models.IntegerField()
+# class Receta(models.Model):
+#     cantidad_usada = models.IntegerField(null=True, blank=True)
+#     materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)
+#     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
+
+
+# class AlertaStock(models.Model):
+#     materiaPrima = models.ForeignKey(MateriaPrima, on_delete=models.DO_NOTHING)
+#     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
+#     Nivel_Minimo = models.IntegerField()
+#     fecha_vencimiento = models.IntegerField()

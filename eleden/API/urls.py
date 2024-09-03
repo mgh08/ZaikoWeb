@@ -8,16 +8,16 @@ from django.contrib.auth.decorators import login_required
 from . import views
 
 router = DefaultRouter()
-router.register(r'AlertaStock', views.AlertaStockViewSet),
+# router.register(r'AlertaStock', views.AlertaStockViewSet),
 router.register(r'Almacen', views.AlmacenViewSet),
 router.register(r'CategoriaProducto', views.CategoriaProductoViewSet),
 router.register(r'Cliente', views.ClienteViewSet),
 router.register(r'Devolucion', views.DevolucionViewSet),
-router.register(r'MateriaPrima', views.MateriaPrimaViewSet),
-router.register(r'MovimientoStock', views.MovimientoStockViewSet),
+# router.register(r'MateriaPrima', views.MateriaPrimaViewSet),
+# router.register(r'MovimientoStock', views.MovimientoStockViewSet),
 router.register(r'ProductoTerminado', views.ProductoTerminadoViewSet),
 router.register(r'Proveedor', views.ProveedorViewSet),
-router.register(r'Receta', views.RecetaViewSet),
+# router.register(r'Receta', views.RecetaViewSet),
 #router.register(r'DetallePedido', views.DetallePedidoViewSet),
 router.register(r'Pedido', views.PedidoViewSet),
 router.register(r'Usuario', views.UsuarioViewSet),
@@ -95,13 +95,13 @@ urlpatterns = [
     path("proveedores_actualizar/", views.proveedores_actualizar,name="proveedores_actualizar"),
     path("proveedores_eliminar/<int:id>/", views.proveedores_eliminar, name="proveedores_eliminar"),
 
-    #materia prima
-    path("registrarMateriaPrima/", views.registrarMateriaPrima, name='registrarMateriaPrima'),
-    path("materiaPrima/",views.materiaPrima, name="materiaPrima"),
-    #path("materia_prima_guardar/",views.materia_prima_guardar, name="materia_prima_guardar"),
-    path("materia_prima_editar/<int:id>/",views.materia_prima_editar, name="materia_prima_editar"),
-    path("materia_prima_actualizar/",views.materia_prima_actualizar, name="materia_prima_actualizar"),
-    path("materia_prima_eliminar/<int:id>/",views.materia_prima_eliminar, name="materia_prima_eliminar"),
+    # #materia prima
+    # path("registrarMateriaPrima/", views.registrarMateriaPrima, name='registrarMateriaPrima'),
+    # path("materiaPrima/",views.materiaPrima, name="materiaPrima"),
+    # #path("materia_prima_guardar/",views.materia_prima_guardar, name="materia_prima_guardar"),
+    # path("materia_prima_editar/<int:id>/",views.materia_prima_editar, name="materia_prima_editar"),
+    # path("materia_prima_actualizar/",views.materia_prima_actualizar, name="materia_prima_actualizar"),
+    # path("materia_prima_eliminar/<int:id>/",views.materia_prima_eliminar, name="materia_prima_eliminar"),
 
     #productos
     path("registrar_producto/", views.registrar_producto, name="registrar_producto"), #posible eliminacion

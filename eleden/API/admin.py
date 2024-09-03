@@ -6,17 +6,12 @@ from .models import *
 
 from django.utils.html import mark_safe
 
-admin.site.register(AlertaStock)
 admin.site.register(Almacen)
 admin.site.register(CategoriaProducto)
 admin.site.register(Cliente)
 admin.site.register(Devolucion)
-admin.site.register(MateriaPrima)
-admin.site.register(MovimientoStock)
 admin.site.register(ProductoTerminado)
 admin.site.register(Proveedor)
-admin.site.register(Receta)
-#admin.site.register(DetallePedido)
 admin.site.register(Pedido)
 admin.site.register(Usuario)
 
