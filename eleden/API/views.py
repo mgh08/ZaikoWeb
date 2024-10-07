@@ -19,7 +19,7 @@ from django.template.loader import render_to_string
 
 from .encriptar import *
 from .serializers import *
-
+from django.contrib.auth import authenticate, login as django_login
 
 # Create your views here.
 
@@ -39,7 +39,7 @@ def index(request):
         return redirect("panelDeGestion")
     else:
         return render(request, "API/index/index.html")
-
+    
 
 def login(request):
     if request.method == "POST":
@@ -73,33 +73,41 @@ def login(request):
     else:
         messages.warning(request, "No se enviaron datos.")
         return redirect("index")
+    
+    
+from random import randint
+import base64
+from django.core.mail import send_mail  # Asegúrate de que tienes configurado el backend de email en settings.py
+from django.contrib import messages
+from .models import Usuario
 
 
 def recuperar_clave_form(request):
     if request.method == "POST":
         try:
-            # Obtén el usuario basado en su nombre de usuario
-            q = Usuario.objects.get(usuario=request.POST.get("correo"))  # Aquí se usa 'usuario' en lugar de 'email'
+            # Buscamos el usuario usando el campo `usuario`
+            q = Usuario.objects.get(usuario=request.POST.get("correo"))
             num = randint(100000, 999999)
 
-            # Convertir num a base64 para ofuscarlo
+            # Convertir el número a base64 para ofuscarlo
             ofuscado = base64.b64encode(str(num).encode("ascii")).decode("ascii")
             q.token = ofuscado
             q.save()
 
-            # Generar la ruta para verificar el token
+            # Generar la URL para la verificación del token
             ruta = request.build_absolute_uri(reverse("verificar_token_form", args=[q.usuario]))
-            
-            # Enviar el correo con el token
-            resultado = enviarCorreo(q.usuario, q.token, ruta)  # Cambia 'q.email' a 'q.usuario'
+
+            # Enviar correo electrónico con el token
+            resultado = enviarCorreo(q.usuario, q.token, ruta)
             messages.info(request, resultado)
 
             return redirect("verificar_token_form", correo=q.usuario)
         except Usuario.DoesNotExist:
-            messages.error(request, "Usuario no existe...")
+            messages.error(request, "Usuario no encontrado.")
             return redirect("recuperar_clave_form")
-    else:
-        return render(request, "API/index/recuperar_clave_form.html")
+
+    return render(request, "API/index/recuperar_clave_form.html")
+
 
 def verificar_token_form(request, correo):
     if request.method == "POST":
@@ -124,43 +132,39 @@ def verificar_token_form(request, correo):
 
 
 def olvide_mi_clave(request, correo):
-	if request.method == "POST":
-		c_nueva1 = request.POST.get("nueva1")
-		c_nueva2 = request.POST.get("nueva2")
+    if request.method == "POST":
+        c_nueva1 = request.POST.get("nueva1")
+        c_nueva2 = request.POST.get("nueva2")
 
-		q = Usuario.objects.get(usuario=correo)
+        try:
+            q = Usuario.objects.get(usuario=correo)
 
-		if c_nueva1 == c_nueva2:
-			# modifico clave al usuario actual (al objeto)
-			clave = hash_password(c_nueva1)
-			q.password = clave
-			# eliminar el token de db
-			q.token = ""
-			# guardo en base de datos
-			q.save()
+            if c_nueva1 == c_nueva2:
+                # Modificar la contraseña de forma segura
+                q.set_password(c_nueva1)
+                q.token = ""  # Borrar el token
+                q.save()
 
-			messages.success(request, "Clave cambiada correctamente!!")
-			return redirect("index")
-		else:
-			messages.warning(request, "Claves nuevas no concuerdan...")
+                messages.success(request, "Clave cambiada correctamente.")
+                return redirect("index")
+            else:
+                messages.warning(request, "Las contraseñas no coinciden.")
+        except Usuario.DoesNotExist:
+            messages.error(request, "Usuario no encontrado.")
 
-		return redirect("olvide_mi_clave", correo=correo)
-	else:
-		contexto = {"correo": correo}
-		return render(request, "API/index/olvide_mi_clave.html", contexto)
+        return redirect("olvide_mi_clave", correo=correo)
+    
+    return render(request, "API/index/olvide_mi_clave.html", {"correo": correo})
 
+
+
+from django.contrib.auth import logout as django_logout
 
 def logout(request):
-    logueo = request.session.get("logueo", False)
-    if logueo:
-        del request.session["logueo"]
-        # del request.session["carrito"]
-        # del request.session["items_carrito"]
-        messages.success(request, "Sesion cerrada correctamente")
-        return redirect("index")
-    else:
-        messages.info(request, "No se pudo cerrar sesión, intente de nuevo")
-        return redirect("panelDeGestion")
+    django_logout(request)
+    messages.success(request, "Sesión cerrada correctamente.")
+    return redirect("index")
+
 
 
 def handle_uploaded_file(f):
@@ -180,32 +184,33 @@ def formulario_cambiar_clave(request):
 
 
 def cambiar_clave(request):
-	if request.method == "POST":
-		# capturo la clave actual del formulario
-		c_actual = request.POST.get("actual")
-		c_nueva1 = request.POST.get("nueva1")
-		c_nueva2 = request.POST.get("nueva2")
+    if request.method == "POST":
+        c_actual = request.POST.get("actual")
+        c_nueva1 = request.POST.get("nueva1")
+        c_nueva2 = request.POST.get("nueva2")
 
-		# capturo variable de sesión para averiguar ID de usuario
-		logueo = request.session.get("logueo", False)
-		q = Usuario.objects.get(pk=logueo["id"])
-		verify = verify_password(c_actual, q.clave)
-		if verify:
-			if c_nueva1 == c_nueva2:
-				# modifico clave al usuario actual (al objeto)
-				clave = hash_password(c_nueva1)
-				q.clave = clave
-				# guardo en base de datos
-				q.save()
-				messages.success(request, "Clave cambiada correctamente!!")
-			else:
-				messages.warning(request, "Claves nuevas no concuerdan...")
-		else:
-			messages.error(request, "Clave actual no corresponde...")
+        logueo = request.session.get("logueo", False)
 
-		return redirect("formulario_cambiar_clave")
-	else:
-		return HttpResponse("No se enviaron datos...")
+        if logueo:
+            try:
+                q = Usuario.objects.get(pk=logueo["id"])
+
+                # Verificar la contraseña actual
+                if q.check_password(c_actual):
+                    if c_nueva1 == c_nueva2:
+                        q.set_password(c_nueva1)
+                        q.save()
+
+                        messages.success(request, "Contraseña cambiada correctamente.")
+                    else:
+                        messages.warning(request, "Las nuevas contraseñas no coinciden.")
+                else:
+                    messages.error(request, "La contraseña actual es incorrecta.")
+            except Usuario.DoesNotExist:
+                messages.error(request, "Usuario no encontrado.")
+        return redirect("formulario_cambiar_clave")
+    
+    return HttpResponse("No se enviaron datos.")
 
 
 def panelDeGestion(request):
@@ -236,27 +241,37 @@ def pruebaGratis(request):
     return render(request, 'API/paquetes/pruebaGratis.html')
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
+from django.contrib import messages
+from .models import Cliente
+
+# Función para listar los clientes
 def clientes(request):
     q = Cliente.objects.all()
     context = {"data": q}
     return render(request, "API/clientes/clientes.html", context)
 
-
+# Función para buscar clientes por nombre o correo
 def buscar(request):
     if request.method == "POST":
         dato = request.POST.get("dato_buscar")
-        q = Cliente.objects.filter(Q(nombre__icontains=dato) | Q(correo_electronico=dato))
-        contexto = {"data": q}
-        return render(request, "API/clientes/clientes.html", contexto)
+        if dato:
+            q = Cliente.objects.filter(Q(nombre__icontains=dato) | Q(correo_electronico__icontains=dato))
+            contexto = {"data": q}
+            return render(request, "API/clientes/clientes.html", contexto)
+        else:
+            messages.warning(request, "Por favor ingrese un dato para buscar.")
+            return redirect("clientes")
     else:
         messages.warning(request, "No se enviaron datos...")
         return redirect("clientes")
 
-
+# Función para mostrar el formulario de creación de cliente
 def clientes_formulario(request):
     return render(request, 'API/clientes/clientes_formulario.html')
 
-
+# Función para guardar un nuevo cliente
 def clientes_guardar(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
@@ -264,49 +279,61 @@ def clientes_guardar(request):
         contacto = request.POST.get("contacto")
         correo_electronico = request.POST.get("correo_electronico")
         direccion = request.POST.get("direccion")
+        
+        # Validaciones básicas
+        if not nombre or not nit or not contacto:
+            messages.error(request, "Los campos nombre, NIT y contacto son obligatorios.")
+            return redirect("clientes_formulario")
+
         try:
             q = Cliente(nombre=nombre, nit=nit, contacto=contacto, correo_electronico=correo_electronico,
                         direccion=direccion)
             q.save()
             messages.success(request, "Registro guardado correctamente!!")
         except Exception as e:
-            messages.error(request, f"Error: {e}")
-            return redirect("clientes")  # Redirige a la página clientes en caso de error
-        return redirect("clientes")  # Redirige a la página clientes después de guardar exitosamente
+            messages.error(request, f"Error al guardar: {e}")
+            return redirect("clientes_formulario")
+        
+        return redirect("clientes")
     else:
         messages.warning(request, "No se enviaron datos...")
         return redirect("clientes_formulario")
 
-
+# Función para mostrar el formulario de edición
 def clientes_formulario_editar(request, id_cliente):
-    q = Cliente.objects.get(pk=id_cliente)
+    q = get_object_or_404(Cliente, pk=id_cliente)
     datos = {"registro": q}
     return render(request, "API/clientes/clientes_formulario.html", datos)
 
-
+# Función para actualizar un cliente
 def clientes_actualizar(request):
-    c = Cliente.objects.get(pk=request.POST.get("id"))
-    try:
-        c.nombre = request.POST.get("nombre")
-        c.nit = request.POST.get("nit")
-        c.contacto = request.POST.get("contacto")
-        c.correo_electronico = request.POST.get("correo_electronico")
-        c.direccion = request.POST.get("direccion")
-        c.save()
-        messages.success(request, "Registro actualizado correctamente!!")
-    except Exception as e:
-        messages.error(request, f"Error: {e}")
-        return redirect("clientes")
+    if request.method == "POST":
+        try:
+            c = Cliente.objects.get(pk=request.POST.get("id"))
+            c.nombre = request.POST.get("nombre")
+            c.nit = request.POST.get("nit")
+            c.contacto = request.POST.get("contacto")
+            c.correo_electronico = request.POST.get("correo_electronico")
+            c.direccion = request.POST.get("direccion")
+            c.save()
+            messages.success(request, "Registro actualizado correctamente!!")
+        except Cliente.DoesNotExist:
+            messages.error(request, "El cliente no existe.")
+        except Exception as e:
+            messages.error(request, f"Error: {e}")
+        
     return redirect("clientes")
 
-
+# Función para eliminar un cliente
 def clientes_eliminar(request, id):
     try:
         q = Cliente.objects.get(pk=id)
         q.delete()
         messages.success(request, "Registro eliminado correctamente!!")
+    except Cliente.DoesNotExist:
+        messages.error(request, "El cliente no existe.")
     except Exception as e:
-        messages.error(request, f"Error: {e}")
+        messages.error(request, f"Error al eliminar: {e}")
 
     return redirect("clientes")
 

@@ -3,6 +3,7 @@ from django.db import models
 from .authentication import CustomUserManager
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.validators import MinLengthValidator
 
 class ventaSoftware(models.Model):
     nombre = models.CharField(max_length=200)
@@ -16,22 +17,21 @@ class ventaSoftware(models.Model):
 
     def __str__(self):
         return f"{self.nombre}"
+    
 
 class Usuario(AbstractUser):
     username = None
     nombreCompleto = models.CharField(max_length=254)
     usuario = models.CharField(max_length=100, unique=True)
-    password = models.CharField(max_length=254)
+    password = models.CharField(max_length=254, validators=[MinLengthValidator(8)])  # Mínimo 8 caracteres
     ROLES = (
         ("ADMIN", "Administrador"),
         ("GEREN", "Gerente"),
         ("USUAR", "Usuario"),
     )
-
     rol = models.CharField(max_length=5, choices=ROLES, default="USUAR", null=True, blank=True)
     foto = models.ImageField(upload_to="fotos/", default="fotos/default.png")
     token = models.CharField(max_length=10, null=True, blank=True)
-    objects = CustomUserManager()
 
     USERNAME_FIELD = "usuario"
     REQUIRED_FIELDS = ["nombreCompleto"]
@@ -74,14 +74,13 @@ class CategoriaProducto(models.Model):
 
 class Cliente(models.Model):
     nombre = models.CharField(max_length=255)
-    nit = models.CharField(max_length=255)
+    nit = models.CharField(max_length=255, unique=True)  # El NIT debe ser único
     contacto = models.CharField(max_length=255)
     correo_electronico = models.EmailField(null=True, blank=True)
     direccion = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombre}"
-
 
 class ProductoTerminado(models.Model):
     nombre = models.CharField(max_length=255)
