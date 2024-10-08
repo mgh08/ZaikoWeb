@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from rest_framework import viewsets
@@ -49,7 +49,6 @@ def login(request):
             q = Usuario.objects.get(usuario=usuario)
             verify = verify_password(clave, q.password)
             if verify:
-                # Guardar información en la sesión
                 request.session["logueo"] = {
                     "id": q.id,
                     "nombre": q.nombreCompleto,
@@ -57,65 +56,42 @@ def login(request):
                 }
                 request.session["carrito"] = []
                 request.session["items_carrito"] = 0
-
                 messages.success(request, f"Bienvenido {q.nombreCompleto}")
-
-                # Redirigir al usuario a la vista 'tienda'
                 return redirect("tienda")
             else:
                 messages.error(request, "Contraseña incorrecta.")
                 return redirect("index")
-
         except Usuario.DoesNotExist:
             messages.error(request, "Usuario no encontrado.")
             return redirect("index")
-
     else:
         messages.warning(request, "No se enviaron datos.")
         return redirect("index")
-    
-    
-from random import randint
-import base64
-from django.core.mail import send_mail  # Asegúrate de que tienes configurado el backend de email en settings.py
-from django.contrib import messages
-from .models import Usuario
+
 
 
 def recuperar_clave_form(request):
     if request.method == "POST":
         try:
-            # Buscamos el usuario usando el campo `usuario`
             q = Usuario.objects.get(usuario=request.POST.get("correo"))
             num = randint(100000, 999999)
-
-            # Convertir el número a base64 para ofuscarlo
             ofuscado = base64.b64encode(str(num).encode("ascii")).decode("ascii")
             q.token = ofuscado
             q.save()
-
-            # Generar la URL para la verificación del token
             ruta = request.build_absolute_uri(reverse("verificar_token_form", args=[q.usuario]))
-
-            # Enviar correo electrónico con el token
             resultado = enviarCorreo(q.usuario, q.token, ruta)
             messages.info(request, resultado)
-
             return redirect("verificar_token_form", correo=q.usuario)
         except Usuario.DoesNotExist:
             messages.error(request, "Usuario no encontrado.")
             return redirect("recuperar_clave_form")
-
     return render(request, "API/index/recuperar_clave_form.html")
 
 
 def verificar_token_form(request, correo):
     if request.method == "POST":
         try:
-            # Buscar el usuario basado en el campo 'usuario'
             q = Usuario.objects.get(usuario=correo)
-            
-            # Verificar que el token coincida y no esté vacío
             if q.token != "" and q.token == request.POST.get("token"):
                 messages.success(request, "Token OK, cambie su clave!!")
                 return redirect("olvide_mi_clave", correo=correo)
@@ -123,11 +99,11 @@ def verificar_token_form(request, correo):
                 messages.error(request, "Token no válido...")
         except Usuario.DoesNotExist:
             messages.error(request, "Usuario no existe...")
-
         return redirect("verificar_token_form", correo=correo)
     else:
         contexto = {"usuario": correo}
         return render(request, "API/index/verificar_token_form.html", contexto)
+
  
 
 
@@ -135,25 +111,19 @@ def olvide_mi_clave(request, correo):
     if request.method == "POST":
         c_nueva1 = request.POST.get("nueva1")
         c_nueva2 = request.POST.get("nueva2")
-
         try:
             q = Usuario.objects.get(usuario=correo)
-
             if c_nueva1 == c_nueva2:
-                # Modificar la contraseña de forma segura
                 q.set_password(c_nueva1)
                 q.token = ""  # Borrar el token
                 q.save()
-
                 messages.success(request, "Clave cambiada correctamente.")
                 return redirect("index")
             else:
                 messages.warning(request, "Las contraseñas no coinciden.")
         except Usuario.DoesNotExist:
             messages.error(request, "Usuario no encontrado.")
-
         return redirect("olvide_mi_clave", correo=correo)
-    
     return render(request, "API/index/olvide_mi_clave.html", {"correo": correo})
 
 
@@ -167,6 +137,7 @@ def logout(request):
 
 
 
+
 def handle_uploaded_file(f):
     with open(f"{settings.MEDIA_ROOT}/fotos/{f.name}", "wb+") as destination:
         for chunk in f.chunks():
@@ -174,13 +145,12 @@ def handle_uploaded_file(f):
 
 
 def formulario_cambiar_clave(request):
-	logueo = request.session.get("logueo", True)
+    logueo = request.session.get("logueo", True)
+    if logueo:
+        return render(request, "API/index/formulario_cambiar_clave.html")
+    else:
+        messages.info
 
-	if logueo:
-		return render(request, "API/index/formulario_cambiar_clave.html")
-	else:
-		messages.info(request, "No tiene permisos para acceder al módulo...")
-		return redirect("index")
 
 
 def cambiar_clave(request):
@@ -241,37 +211,52 @@ def pruebaGratis(request):
     return render(request, 'API/paquetes/pruebaGratis.html')
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q
-from django.contrib import messages
-from .models import Cliente
-
 # Función para listar los clientes
+from django.core.paginator import Paginator
+
 def clientes(request):
     q = Cliente.objects.all()
-    context = {"data": q}
+    
+    # Paginación para mejorar el rendimiento y la experiencia del usuario
+    paginator = Paginator(q, 10)  # 10 clientes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {"data": page_obj}
     return render(request, "API/clientes/clientes.html", context)
 
-# Función para buscar clientes por nombre o correo
+
+import re
+
 def buscar(request):
     if request.method == "POST":
         dato = request.POST.get("dato_buscar")
-        if dato:
-            q = Cliente.objects.filter(Q(nombre__icontains=dato) | Q(correo_electronico__icontains=dato))
-            contexto = {"data": q}
-            return render(request, "API/clientes/clientes.html", contexto)
-        else:
+        
+        if not dato:
             messages.warning(request, "Por favor ingrese un dato para buscar.")
             return redirect("clientes")
+        
+        # Expresión regular para evitar caracteres no permitidos (por ejemplo, inyección SQL)
+        if not re.match(r'^[a-zA-Z0-9@.\s]*$', dato):
+            messages.error(request, "El dato de búsqueda contiene caracteres no permitidos.")
+            return redirect("clientes")
+
+        q = Cliente.objects.filter(Q(nombre__icontains=dato) | Q(correo_electronico__icontains=dato))
+        contexto = {"data": q}
+        return render(request, "API/clientes/clientes.html", contexto)
+    
     else:
         messages.warning(request, "No se enviaron datos...")
         return redirect("clientes")
+
 
 # Función para mostrar el formulario de creación de cliente
 def clientes_formulario(request):
     return render(request, 'API/clientes/clientes_formulario.html')
 
 # Función para guardar un nuevo cliente
+from django.core.validators import validate_email
+
 def clientes_guardar(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
@@ -279,25 +264,40 @@ def clientes_guardar(request):
         contacto = request.POST.get("contacto")
         correo_electronico = request.POST.get("correo_electronico")
         direccion = request.POST.get("direccion")
-        
+
         # Validaciones básicas
         if not nombre or not nit or not contacto:
             messages.error(request, "Los campos nombre, NIT y contacto son obligatorios.")
             return redirect("clientes_formulario")
 
+        # Validar NIT único
+        if Cliente.objects.filter(nit=nit).exists():
+            messages.error(request, "El NIT ya está registrado. Ingrese un NIT único.")
+            return redirect("clientes_formulario")
+
+        # Validar correo electrónico
+        if correo_electronico:
+            try:
+                validate_email(correo_electronico)
+            except ValidationError:
+                messages.error(request, "Correo electrónico inválido.")
+                return redirect("clientes_formulario")
+
         try:
             q = Cliente(nombre=nombre, nit=nit, contacto=contacto, correo_electronico=correo_electronico,
                         direccion=direccion)
             q.save()
-            messages.success(request, "Registro guardado correctamente!!")
+            messages.success(request, "Registro guardado correctamente.")
         except Exception as e:
             messages.error(request, f"Error al guardar: {e}")
             return redirect("clientes_formulario")
-        
+
         return redirect("clientes")
+
     else:
         messages.warning(request, "No se enviaron datos...")
         return redirect("clientes_formulario")
+
 
 # Función para mostrar el formulario de edición
 def clientes_formulario_editar(request, id_cliente):
@@ -310,26 +310,48 @@ def clientes_actualizar(request):
     if request.method == "POST":
         try:
             c = Cliente.objects.get(pk=request.POST.get("id"))
+            
+            nuevo_nit = request.POST.get("nit")
+            
+            # Validar que el NIT actualizado sea único, pero permitiendo el NIT actual del cliente
+            if Cliente.objects.filter(nit=nuevo_nit).exclude(pk=c.pk).exists():
+                messages.error(request, "El NIT ya está registrado.")
+                return redirect("clientes_formulario_editar", id_cliente=c.pk)
+            
+            # Validar correo electrónico
+            correo_electronico = request.POST.get("correo_electronico")
+            if correo_electronico:
+                try:
+                    validate_email(correo_electronico)
+                except ValidationError:
+                    messages.error(request, "Correo electrónico inválido.")
+                    return redirect("clientes_formulario_editar", id_cliente=c.pk)
+
             c.nombre = request.POST.get("nombre")
-            c.nit = request.POST.get("nit")
+            c.nit = nuevo_nit
             c.contacto = request.POST.get("contacto")
-            c.correo_electronico = request.POST.get("correo_electronico")
+            c.correo_electronico = correo_electronico
             c.direccion = request.POST.get("direccion")
             c.save()
+            
             messages.success(request, "Registro actualizado correctamente!!")
         except Cliente.DoesNotExist:
             messages.error(request, "El cliente no existe.")
         except Exception as e:
             messages.error(request, f"Error: {e}")
         
-    return redirect("clientes")
+        return redirect("clientes")
+
 
 # Función para eliminar un cliente
 def clientes_eliminar(request, id):
     try:
-        q = Cliente.objects.get(pk=id)
-        q.delete()
-        messages.success(request, "Registro eliminado correctamente!!")
+        cliente = Cliente.objects.get(pk=id)
+        if Pedido.objects.filter(clientes=cliente).exists():  # Corregido 'cliente' por 'clientes'
+            messages.error(request, "No se puede eliminar el cliente porque tiene pedidos asociados.")
+        else:
+            cliente.delete()
+            messages.success(request, "Cliente eliminado correctamente.")
     except Cliente.DoesNotExist:
         messages.error(request, "El cliente no existe.")
     except Exception as e:
@@ -344,28 +366,42 @@ class DevolucionFormulario(forms.ModelForm):
         model = Devolucion
         fields = '__all__'
 
-
 def devoluciones_guardar(request):
     if request.method == 'POST':
         fecha_devolucion = request.POST.get("fecha_devolucion")
         motivo = request.POST.get("motivo")
         foto = request.FILES.get("foto") if request.FILES.get("foto") else 'fotos/default.png'
         nombre_productos = request.POST.get("productos")
+        
+        # Validar campos obligatorios
+        if not motivo or not nombre_productos:
+            messages.error(request, "El motivo y el producto son campos obligatorios.")
+            return redirect("registrar_devoluciones")
+
+        # Validar que el producto exista
         try:
             productos = ProductoTerminado.objects.get(nombre=nombre_productos)
         except ProductoTerminado.DoesNotExist:
-            messages.error(request, f"Devolucion {nombre_productos} no encontrado")
-            return redirect("registrarDevoluciones")
+            messages.error(request, f"El producto {nombre_productos} no fue encontrado.")
+            return redirect("registrar_devoluciones")
+
+        # Validar el formato de la imagen
+        if foto and not foto.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            messages.error(request, "Solo se permiten imágenes en formato PNG, JPG o JPEG.")
+            return redirect("registrar_devoluciones")
+
+        # Guardar la devolución
         try:
-            q = Devolucion(fecha_devolucion=fecha_devolucion, motivo=motivo, foto=foto, productos=productos)
-            q.save()
-            messages.success(request, "Devoluciones guardadas exitosamente...")
+            devolucion = Devolucion(fecha_devolucion=fecha_devolucion, motivo=motivo, foto=foto, productos=productos)
+            devolucion.save()
+            messages.success(request, "Devoluciones guardadas exitosamente.")
         except Exception as e:
-            messages.error(request, f"error: {e}")
-            # return redirect("registrarDevoluciones")
+            messages.error(request, f"Error al guardar la devolución: {e}")
+            return redirect("registrar_devoluciones")
+
         return redirect("listarDevoluciones")
     else:
-        messages.warning(request, "no se han enviado datos...")
+        messages.warning(request, "No se han enviado datos...")
         return redirect("listarDevoluciones")
 
 
@@ -397,28 +433,42 @@ def devoluciones_editar(request, id):
 
 def devoluciones_actualizar(request):
     id = request.POST.get("id")
-    d = Devolucion.objects.get(pk=id)
     try:
-        d.fecha_devolucion = request.POST.get("fecha_devolucion")
-        d.motivo = request.POST.get("motivo")
-        d.foto = request.FILES.get("foto") if request.FILES.get("foto") else None
+        devolucion = Devolucion.objects.get(pk=id)
+        motivo = request.POST.get("motivo")
+        foto = request.FILES.get("foto") if request.FILES.get("foto") else devolucion.foto
         nombre_productos = request.POST.get("productos")
+        
+        # Validar campos obligatorios
+        if not motivo or not nombre_productos:
+            messages.error(request, "El motivo y el producto son campos obligatorios.")
+            return redirect(f"devoluciones_editar/{id}/")
+        
+        # Validar que el producto exista
         try:
             productos = ProductoTerminado.objects.get(nombre=nombre_productos)
         except ProductoTerminado.DoesNotExist:
-            messages.error(request, f"Producto {nombre_productos} no encontrado")
-            return redirect("listarDevoluciones")
-        d.productos = productos
-        d.save()
+            messages.error(request, f"El producto {nombre_productos} no fue encontrado.")
+            return redirect(f"devoluciones_editar/{id}/")
+        
+        # Validar el formato de la imagen
+        if foto and not foto.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            messages.error(request, "Solo se permiten imágenes en formato PNG, JPG o JPEG.")
+            return redirect(f"devoluciones_editar/{id}/")
+        
+        # Actualizar la devolución
+        devolucion.motivo = motivo
+        devolucion.foto = foto
+        devolucion.productos = productos
+        devolucion.save()
         messages.success(request, "Actualizado correctamente!!")
+    except Devolucion.DoesNotExist:
+        messages.error(request, "La devolución no existe.")
     except Exception as e:
         messages.error(request, f"Error: {e}")
-        return redirect("listarDevoluciones")
     return redirect("listarDevoluciones")
 
 
-# proveedores
-# proveedores
 def proveedores(request):
     return render(request, 'API/proveedores/proveedores.html')
 
@@ -621,6 +671,9 @@ def productos_eliminar(request, id):
     return redirect("productoTerminado")
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
 def productos_guardar(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
@@ -631,6 +684,7 @@ def productos_guardar(request):
         fecha_vencimiento = request.POST.get("fecha_vencimiento")
         precio = request.POST.get("precio")
         foto = request.FILES.get("foto")
+
         try:
             q = ProductoTerminado(
                 nombre=nombre,
@@ -642,18 +696,18 @@ def productos_guardar(request):
                 precio=precio,
                 foto=foto
             )
+            q.full_clean()  # Esto activará las validaciones definidas
             q.save()
             messages.success(request, "Registro guardado correctamente!!")
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+            return redirect('registrar_producto')  # Redirige al formulario para corregir errores
         except Exception as e:
             messages.error(request, f"Error: {e}")
-            # Redirige a la página clientes en caso de error
-        return redirect("productoTerminado")  # Redirige a la página clientes después de guardar exitosamente
-    else:
-        messages.warning(request, "No se enviaron datos...")
-        return redirect("productoTerminado")
 
+    return redirect("productoTerminado")
 
-# R
 
 
 def productos_actualizar(request, id):
@@ -954,215 +1008,332 @@ def registrarse(request):
             return redirect("index")
     else:
         return render(request, "API/index/index.html")
-
+    
+from django.contrib.auth.decorators import login_required
 
 # Carrito
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db import transaction
+from django.utils import timezone
+from django.contrib import messages
+from django.http import HttpResponseNotAllowed, JsonResponse
+from .models import VentaSoftware
+
+# def carrito_add(request, producto_id):
+#     if request.method == 'POST':
+#         # Lógica para agregar el producto al carrito
+#         cantidad = int(request.POST.get('cantidad', 1))
+#         producto = get_object_or_404(VentaSoftware, id=producto_id)
+
+#         # Validaciones
+#         if cantidad <= 0:
+#             messages.error(request, "La cantidad debe ser mayor a cero.")
+#             return redirect('tienda')
+
+#         if producto.stock < cantidad:
+#             messages.error(request, f"Solo quedan {producto.stock} unidades disponibles.")
+#             return redirect('tienda')
+
+#         # Agregar al carrito en la sesión
+#         carrito = request.session.get('carrito', {})
+#         if producto_id in carrito:
+#             carrito[producto_id]['cantidad'] += cantidad  # Incrementar la cantidad
+#         else:
+#             carrito[producto_id] = {
+#                 'nombre': producto.nombre,
+#                 'precio': producto.precio,
+#                 'cantidad': cantidad,
+#                 'subtotal': producto.precio * cantidad  # Calcular subtotal
+#             }
+
+#         # Guardar el carrito en la sesión
+#         request.session['carrito'] = carrito
+#         request.session['items_carrito'] = sum(item['cantidad'] for item in carrito.values())  # Actualizar conteo de items
+
+#         messages.success(request, f"{producto.nombre} agregado al carrito.")
+#         return redirect('tienda')  # Redirigir a la tienda
+
+#     # Si no es una solicitud POST, devolver un error 405 (Método no permitido)
+#     return HttpResponseNotAllowed(['POST'])
+
+def carrito_add(request, producto_id):
+    if request.method == 'POST':  # Solo permitir POST
+        # Obtener la cantidad del formulario o la solicitud
+        cantidad = int(request.POST.get('cantidad', 1))
+
+        # Obtener el producto
+        producto = get_object_or_404(VentaSoftware, id=producto_id)
+
+        # Validar la cantidad y stock
+        if cantidad <= 0 or producto.stock < cantidad:
+            return JsonResponse({"error": "Cantidad no válida o stock insuficiente"}, status=400)
+
+        # Agregar al carrito (a la sesión del usuario)
+        carrito = request.session.get('carrito', {})
+        if producto_id in carrito:
+            carrito[producto_id]['cantidad'] += cantidad
+        else:
+            carrito[producto_id] = {
+                'nombre': producto.nombre,
+                'precio': producto.precio,
+                'cantidad': cantidad
+            }
+        request.session['carrito'] = carrito
+        return JsonResponse({"mensaje": "Producto agregado al carrito"})
+
+    return HttpResponseNotAllowed(['POST'])  # Si no es POST, devolver error 405
+
+
 def ver_carrito(request):
-    carrito = request.session.get("carrito", [])
-
-    total = 0
+    carrito = request.session.get("carrito", {})
     productos = []
-    for p in carrito:
-        q = ventaSoftware.objects.get(pk=p["id"])
-        q.cantidad = p["cantidad"]
-        q.subtotal = int(p["cantidad"]) * q.precio
-        productos.append(q)
-        total += int(q.subtotal)
+    total = 0
 
-    contexto = {"data": productos, "total": total}
-    return render(request, "API/carrito/carrito.html", contexto)
+    # Verifica si el carrito no está vacío
+    if not carrito:
+        messages.info(request, "Tu carrito está vacío.")
+        return render(request, 'API/carrito/carrito.html', {'data': productos, 'total': total})
+
+    for id_producto, item in carrito.items():
+        try:
+            # Intenta obtener el producto
+            producto = VentaSoftware.objects.get(pk=id_producto)
+            producto.cantidad = item['cantidad']
+            producto.subtotal = producto.precio * producto.cantidad
+            productos.append(producto)
+            total += producto.subtotal
+        except VentaSoftware.DoesNotExist:
+            # Maneja el caso donde el producto no existe
+            messages.warning(request, f"El producto con ID {id_producto} no existe en la base de datos. Se eliminará del carrito.")
+            del carrito[id_producto]  # Eliminar del carrito si no existe
+            request.session['carrito'] = carrito  # Actualizar la sesión
+        except Exception as e:
+            messages.error(request, f"Ocurrió un error: {str(e)}")
+
+    return render(request, 'API/carrito/carrito.html', {'data': productos, 'total': total})
+
 
 
 def eliminar_item_carrito(request, id_producto):
-    carrito = request.session.get("carrito", False)
-    for i, p in enumerate(carrito):
-        if id_producto == int(p["id"]):
-            carrito.pop(i)
-            messages.info(request, "Producto eliminado...")
-            break
-    else:
-        messages.warning(request, "Producto no encontrado...")
+    carrito = request.session.get('carrito', {})
 
-    request.session["carrito"] = carrito
-    request.session["items_carrito"] = len(carrito)
-    return redirect("ver_carrito")
+    if str(id_producto) in carrito:
+        del carrito[str(id_producto)]
+        request.session['carrito'] = carrito
+        request.session['items_carrito'] = sum(item['cantidad'] for item in carrito.values())
+        messages.success(request, "Producto eliminado del carrito.")
+    else:
+        messages.error(request, "El producto no está en el carrito.")
+
+    return redirect('ver_carrito')
+
+def vaciar_carrito(request):
+    request.session['carrito'] = {}
+    request.session['items_carrito'] = 0
+    messages.success(request, "Carrito vaciado con éxito.")
+    return redirect('tienda')
 
 
 @transaction.atomic
 def guardar_compra(request):
-    carrito = request.session.get("carrito", False)
+    carrito = request.session.get('carrito', {})
 
-    # capturo variable de sesión para averiguar ID de usuario
-    logueo = request.session.get("logueo", False)
-    u = Usuario.objects.get(pk=logueo["id"])
-    # import traceback
+    # Validación: Verificar que el carrito no esté vacío
+    if not carrito:
+        messages.error(request, "El carrito está vacío. No se puede realizar la compra.")
+        return redirect('ver_carrito')
+
+    # Validación: Verificar si el usuario está autenticado
+    if not request.user.is_authenticated:
+        messages.error(request, "Debes iniciar sesión para realizar una compra.")
+        return redirect('login')
+
+    total_compra = sum(item['subtotal'] for item in carrito.values())
+
+    # Crear la compra
     try:
-        c = Compra(usuario=u)
-        c.save()
-        print(f"Id compra: {c.id}")
+        compra = Compra.objects.create(usuario=request.user, fecha=timezone.now(), estado=1)
 
-        for p in carrito:
-            try:
-                pro = ventaSoftware.objects.get(pk=p["id"])
-            except ventaSoftware.DoesNotExist:
-                raise Exception(f"No se pudo realizar la compra, El producto {pro} ya no existe..")
+        for producto_id, detalles in carrito.items():
+            producto = get_object_or_404(VentaSoftware, id=producto_id)
 
-            if pro.stock >= p["cantidad"]:
-                dc = DetalleCompra(
-                    id_compra=c,
-                    producto=pro,
-                    cantidad=int(p["cantidad"]),
-                    precio=pro.precio
-                )
-                dc.save()
-                # disminuir inventario
-                pro.stock -= int(p["cantidad"])
-                pro.save()
-            else:
-                raise Exception(f"El producto {pro} no tiene suficiente inventario...")
+            # Validación de stock
+            if producto.stock < detalles['cantidad']:
+                messages.error(request, f"No hay suficiente stock disponible para {producto.nombre}.")
+                return redirect('ver_carrito')
 
-        # vaciar carrito e items en cero.
-        request.session["carrito"] = []
-        request.session["items_carrito"] = 0
+            # Guardar detalles de la compra
+            Compra.objects.create(compra=compra, producto=producto, cantidad=detalles['cantidad'], precio=producto.precio)
 
-        messages.success(request, "Compra guardada correctamente!!")
+            # Reducir stock
+            producto.stock -= detalles['cantidad']
+            producto.save()
+
+        # Vaciar el carrito
+        request.session['carrito'] = {}
+        request.session['items_carrito'] = 0
+
+        messages.success(request, f"Compra realizada con éxito. Total pagado: ${total_compra}")
+        return redirect('tienda')
+
     except Exception as e:
-        # ************* si ERROR **********
-        transaction.set_rollback(True)
-        # rollback
-        messages.warning(request, f"Error: {e}")  # - {traceback.format_exc()}
-
-    return redirect("tienda")
-
-
-def vaciar_carrito(request):
-    carrito = request.session.get("carrito", False)
-    try:
-        # vaciar lista....
-        carrito.clear()
-
-        request.session["carrito"] = carrito
-        request.session["items_carrito"] = 0
-        messages.success(request, "Ya no hay items en el carrito!!")
-    except Exception as e:
-        messages.error(request, "Ocurrió un error, intente de nuevo...")
-
-    return redirect("tienda")
-
-
-def carrito_add(request):
-    if request.method == "GET":
-        id_producto = request.GET.get("id_producto")
-        cantidad = int(request.GET.get("cantidad"))
-        q = ventaSoftware.objects.get(pk=id_producto)
-        carrito = request.session.get("carrito", [])
-        if not isinstance(carrito, list):
-            carrito = []
-            request.session["carrito"] = carrito
-            request.session["items_carrito"] = 0
-
-        for p in carrito:
-            if id_producto == p["id"]:
-                p["cantidad"] += cantidad
-                messages.info(request, "Producto ya existe, cantidad actualizada")
-                break
-        else:
-            carrito.append({"id": id_producto, "cantidad": cantidad})
-            messages.success(request, "Producto agregado correctamente!!")
-
-        request.session["carrito"] = carrito
-        request.session["items_carrito"] = len(carrito)
-
-        return redirect("ver_carrito")
-    else:
-        return HttpResponse("No se enviaron datos...")
+        messages.error(request, f"Hubo un error al procesar la compra: {str(e)}")
+        return redirect('ver_carrito')
 
 
 def productos_listar_software(request):
     logueo = request.session.get("logueo", False)
 
     if logueo and (logueo["rol"] == "ADMIN"):
-        q = ventaSoftware.objects.all()
-        context = {"data": q}
+        productos = VentaSoftware.objects.all()
+        context = {"data": productos}
         return render(request, "API/carrito/listarSoftware/listarSoftware.html", context)
     else:
-        messages.info(request, "No tiene permisos para acceder al módulo...")
+        messages.info(request, "No tiene permisos para acceder al módulo.")
         return redirect("index")
 
 
 def productos_guardar_software(request):
     if request.method == "POST":
         foto = request.FILES.get("foto")
-        if foto is None:
-            foto = "fotos_paquetes/default.png"
-        nombre = request.POST.get("nombre")
-        stock = request.POST.get("stock")
-        descripcion = request.POST.get("descripcion")
-        precio = request.POST.get("precio")
-        try:
-            q = ventaSoftware(foto=foto, nombre=nombre, stock=stock, descripcion=descripcion, precio=precio)
-            q.save()
-            messages.success(request, "Registro guardado correctamente!!")
-        except Exception as e:
-            messages.error(request, f"Error: {e}")
+        if not foto:
+            foto = "fotos_paquetes/default.png"  # Asumiendo que tienes una imagen por defecto.
+        
+        nombre = request.POST.get("nombre", "").strip()
+        descripcion = request.POST.get("descripcion", "").strip()
+        stock = request.POST.get("stock", "0").strip()
+        precio = request.POST.get("precio", "0").strip()
 
+        # Validaciones manuales
+        if not nombre or len(nombre) < 3:
+            messages.error(request, "El nombre es obligatorio y debe tener al menos 3 caracteres.")
+            return redirect("productos_formulario")
+        
+        if not descripcion or len(descripcion) < 10:
+            messages.error(request, "La descripción es obligatoria y debe tener al menos 10 caracteres.")
+            return redirect("productos_formulario")
+        
+        try:
+            stock = int(stock)
+            if stock < 0:
+                raise ValueError("El stock no puede ser negativo.")
+        except ValueError:
+            messages.error(request, "El stock debe ser un número entero no negativo.")
+            return redirect("productos_formulario")
+
+        try:
+            precio = float(precio)
+            if precio < 0:
+                raise ValueError("El precio no puede ser negativo.")
+        except ValueError:
+            messages.error(request, "El precio debe ser un número válido y no puede ser negativo.")
+            return redirect("productos_formulario")
+
+        try:
+            nuevo_producto = VentaSoftware(
+                foto=foto, nombre=nombre, stock=stock, descripcion=descripcion, precio=precio
+            )
+            nuevo_producto.full_clean()  # Validación de modelo
+            nuevo_producto.save()
+            messages.success(request, "Registro guardado correctamente.")
+        except ValidationError as e:
+            messages.error(request, f"Error en la validación del producto: {e}")
+        except Exception as e:
+            messages.error(request, f"Error al guardar el producto: {e}")
+        
         return redirect("productos_listar_software")
     else:
-        messages.warning(request, "No se enviaron datos...")
+        messages.warning(request, "No se enviaron datos.")
         return redirect("productos_formulario")
 
 
 def productos_actualizar_software(request):
-    p = ventaSoftware.objects.get(pk=request.POST.get("id"))
-    try:
+    if request.method == "POST":
+        producto = get_object_or_404(VentaSoftware, pk=request.POST.get("id"))
+
         foto = request.FILES.get("foto")
-        if foto is None:
-            foto = p.foto
-        p.foto = foto
-        p.nombre = request.POST.get("nombre")
-        p.stock = request.POST.get("stock")
-        p.precio = request.POST.get("precio")
-        p.save()
-        messages.success(request, "Registro actualizado correctamente!!")
-    except Exception as e:
-        messages.error(request, f"Error: {e}")
-    return redirect("productos_listar_software")
+        if not foto:
+            foto = producto.foto  # Mantener la foto actual si no se selecciona una nueva.
+        
+        nombre = request.POST.get("nombre", "").strip()
+        descripcion = request.POST.get("descripcion", "").strip()
+        stock = request.POST.get("stock", "0").strip()
+        precio = request.POST.get("precio", "0").strip()
+
+        # Validaciones manuales
+        if not nombre or len(nombre) < 3:
+            messages.error(request, "El nombre es obligatorio y debe tener al menos 3 caracteres.")
+            return redirect("productos_formulario")
+
+        if not descripcion or len(descripcion) < 10:
+            messages.error(request, "La descripción es obligatoria y debe tener al menos 10 caracteres.")
+            return redirect("productos_formulario")
+
+        try:
+            stock = int(stock)
+            if stock < 0:
+                raise ValueError("El stock no puede ser negativo.")
+        except ValueError:
+            messages.error(request, "El stock debe ser un número entero no negativo.")
+            return redirect("productos_formulario")
+
+        try:
+            precio = float(precio)
+            if precio < 0:
+                raise ValueError("El precio no puede ser negativo.")
+        except ValueError:
+            messages.error(request, "El precio debe ser un número válido y no puede ser negativo.")
+            return redirect("productos_formulario")
+
+        try:
+            producto.foto = foto
+            producto.nombre = nombre
+            producto.stock = stock
+            producto.descripcion = descripcion
+            producto.precio = precio
+            producto.full_clean()  # Validación de modelo
+            producto.save()
+            messages.success(request, "Registro actualizado correctamente.")
+        except ValidationError as e:
+            messages.error(request, f"Error en la validación del producto: {e}")
+        except Exception as e:
+            messages.error(request, f"Error al actualizar el producto: {e}")
+        
+        return redirect("productos_listar_software")
 
 
 def productos_editar_software(request, id_producto):
-    query_productos = ventaSoftware.objects.get(pk=id_producto)
-
-    contexto = {"registro": query_productos}
+    producto = get_object_or_404(VentaSoftware, pk=id_producto)
+    contexto = {"registro": producto}
     return render(request, "API/carrito/editarSoftware/editarSoftware.html", contexto)
 
 
 def productos_eliminar_software(request, id_producto):
     try:
-        q = ventaSoftware.objects.get(pk=id_producto)
-        q.delete()
-        messages.success(request, "Registro eliminado correctamente!!")
+        producto = get_object_or_404(VentaSoftware, pk=id_producto)
+        producto.delete()
+        messages.success(request, "Registro eliminado correctamente.")
     except Exception as e:
-        messages.error(request, f"Error: {e}")
+        messages.error(request, f"Error al eliminar el producto: {e}")
 
     return redirect("productos_listar_software")
 
 
 def productos_formulario_software(request):
-    q = ventaSoftware.objects.all()
-    context = {"data": q}
-    return render(request, "API/carrito/editarSoftware/editarSoftware.html", context)
+    return render(request, "API/carrito/editarSoftware/editarSoftware.html")
 
 
 def tienda(request):
-    # logueo = request.session.get("logueo", False)
-    logueo = True
+    logueo = True  # Esto debería ser gestionado adecuadamente
     if logueo:
-        p = ventaSoftware.objects.all()
-        contexto = {"data": p}
+        productos = VentaSoftware.objects.all()
+        print(productos)  # Agrega esto para depurar
+        contexto = {"productos": productos}
         return render(request, 'API/carrito/tienda.html', contexto)
     else:
         return redirect("index")
+
     
 from django.shortcuts import render
 
@@ -1305,8 +1476,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
 #     serializer_class = AlertaStockSerializer
 
 
-class ventaSoftwareViewSet(viewsets.ModelViewSet):
+class VentaSoftwareViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ventaSoftware.objects.all()
-    serializer_class = ventaSoftwareSerializer
+    queryset = VentaSoftware.objects.all()
+    serializer_class = VentaSoftwareSerializer

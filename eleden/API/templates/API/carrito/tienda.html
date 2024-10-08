@@ -9,36 +9,32 @@
         </div>
         <div class="container__trust container__box-cardPrimary">
 
-                {% if data %}
-                    {% for p in data %}
-                        <div class="container__box-cardPrimary">
-                                <div class="card__trust box__card-primary">
-                                    <img src="{{ p.foto.url }}" alt="fotoPorducto">
-                                    <h2>{{ p.nombre }}</h2>
-                                    <p>{{ p.descripcion }}</p>
-                                    <a href="#"><i class="fa-solid fa-angle-right"></i></a>
-                                    <p class="card-text">Precio: <strong>{{ p.precio }}</strong></p>
-                                    {% if p.stock > 0 and p.stock < 5 %}
-                                        <strong class="text-danger">Últimas {{ p.stock }} unidades</strong>
-                                    {% endif %}
-                                    {% if p.stock == 0 %}
-                                        <strong class="text-danger">Producto Agotado</strong>
-                                    {% else %}
-                                        <input type="hidden" value="{{ p.id }}" name="id_producto" id="id_producto_{{ p.id }}">
-                                        <h6>Cantidad</h6>
-                                        <input style="text-align: center;width: 40px;" type="number" size="3" value="1" min="1" max="{{ p.stock }}" name="cantidad" id="cantidad_{{ p.id }}">
-                                        <br>
-                                        <button onclick="add_carrito(`{% url 'carrito_add' %}`, {{ p.id }})" type="button" class="btn btn-info">Agregar Carrito</button>
-                                        <small class="text-body-secondary"></small>
-                                    {% endif %}
-                                </div>
+            {% if productos %}
+                {% for producto in productos %}
+                    <div class="container__box-cardPrimary">
+                        <div class="card__trust box__card-primary">
+                            <img src="{{ producto.foto.url }}" style="width: 300px;" alt="Foto del Producto">
+                            <h2>{{ producto.nombre }}</h2>
+                            <p>{{ producto.descripcion }}</p>
+                            <p class="card-text">Precio: <strong>{{ producto.precio }}</strong></p>
+
+                            {% if producto.stock > 0 and producto.stock < 5 %}
+                                <strong class="text-danger">Últimas {{ producto.stock }} unidades</strong>
+                            {% elif producto.stock == 0 %}
+                                <strong class="text-danger">Producto Agotado</strong>
+                            {% else %}
+                                <h6>Cantidad</h6>
+                                <input style="text-align: center;width: 40px;" type="number" size="3" value="1" min="1" max="{{ producto.stock }}" name="cantidad" id="cantidad_{{ producto.id }}">
+                                <button type="button" class="btn btn-info" onclick="add_carrito('{% url 'agregar_al_carrito' producto.id %}', {{ producto.id }})">Agregar Carrito</button>
+                            {% endif %}
                         </div>
-                    {% endfor %}
-                {% else %}  
-                    <div class="col">
-                        No hay productos.
                     </div>
-                {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="col">
+                    No hay productos disponibles.
+                </div>
+            {% endif %}
         </div>
         <br>
         <br>
@@ -46,3 +42,46 @@
 </div>
 
 {% endblock %}
+
+<script>
+
+    function add_carrito(url, producto_id) {
+        console.log('Agregando al carrito:', producto_id);  // Verificación
+        const cantidad = document.getElementById(`cantidad_${producto_id}`).value; 
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ id_producto: producto_id, cantidad: cantidad })
+        }).then(response => {
+            if (response.ok) {
+                alert('Producto agregado al carrito');
+            } else {
+                alert('Hubo un error al agregar el producto al carrito.');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+    
+    
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>

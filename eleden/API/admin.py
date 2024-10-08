@@ -25,6 +25,6 @@ class UsuarioAdmin(admin.ModelAdmin):
 class ventaSoftwareAdmin(admin.ModelAdmin):
     list_display = ["foto","nombre"]
 
-admin.site.register(ventaSoftware,ventaSoftwareAdmin)
+admin.site.register(VentaSoftware,ventaSoftwareAdmin)
 
 

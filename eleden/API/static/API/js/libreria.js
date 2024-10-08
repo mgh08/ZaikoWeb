@@ -124,3 +124,42 @@ function quitar_alertas(){
         });
     }, 1000);
 }
+
+function add_carrito(url, producto_id) {
+    console.log('Agregando al carrito:', producto_id);  // Verificación
+    const cantidad = document.getElementById(`cantidad_${producto_id}`).value; 
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ id_producto: producto_id, cantidad: cantidad })
+    }).then(response => {
+        if (response.ok) {
+            alert('Producto agregado al carrito');
+        } else {
+            alert('Hubo un error al agregar el producto al carrito.');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
