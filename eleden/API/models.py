@@ -2,55 +2,72 @@ from django.db import models
 
 from .authentication import CustomUserManager
 
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, User
+from django.core.validators import MinLengthValidator
 
-class ventaSoftware(models.Model):
+from django.conf import settings  # Importa la configuración de Django
+# from django.contrib.auth.models import User  # Esto ya no es necesario
+
+class VentaSoftware(models.Model):
     nombre = models.CharField(max_length=200)
     stock = models.IntegerField()
     precio = models.IntegerField()
     descripcion = models.TextField(help_text="Descripción del producto")
     foto = models.ImageField(upload_to="fotos_paquetes/", default="fotos_paquetes/default.png")
 
-    def subtotal(self):
-        return f"${self.stock * self.precio}"
+    def subtotal(self, cantidad):
+        return self.precio * cantidad
 
     def __str__(self):
         return f"{self.nombre}"
+
+class Compra(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)  # Cambia aquí
+    ESTADO = (
+        (1, "Creado"),
+        (2, "Enviado"),
+        (3, "Cancelado"),
+    )
+    estado = models.IntegerField(choices=ESTADO, default=1, blank=True)
+
+    def __str__(self):
+        return f"{self.id} - {self.usuario}"
+
+class ItemCompra(models.Model):
+    compra = models.ForeignKey(Compra, on_delete=models.CASCADE)
+    venta_software = models.ForeignKey(VentaSoftware, on_delete=models.CASCADE)
+    cantidad = models.IntegerField()
+
+    @property
+    def subtotal(self):
+        return self.venta_software.subtotal(self.cantidad)
+
+    
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.core.validators import MinLengthValidator
 
 class Usuario(AbstractUser):
     username = None
     nombreCompleto = models.CharField(max_length=254)
     usuario = models.CharField(max_length=100, unique=True)
-    password = models.CharField(max_length=254)
+    password = models.CharField(max_length=254, validators=[MinLengthValidator(8)])  # Mínimo 8 caracteres
     ROLES = (
         ("ADMIN", "Administrador"),
         ("GEREN", "Gerente"),
         ("USUAR", "Usuario"),
     )
-
     rol = models.CharField(max_length=5, choices=ROLES, default="USUAR", null=True, blank=True)
     foto = models.ImageField(upload_to="fotos/", default="fotos/default.png")
     token = models.CharField(max_length=10, null=True, blank=True)
-    objects = CustomUserManager()
 
     USERNAME_FIELD = "usuario"
     REQUIRED_FIELDS = ["nombreCompleto"]
 
     def __str__(self):
         return f"{self.nombreCompleto} - {self.rol}"
-
-class Compra(models.Model):
-    fecha = models.DateTimeField(auto_now_add=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING)
-    ESTADO = (
-        (1, "Creado"),
-        (2, "Enviado"),
-        (3, "Cancelado"),
-        )
-    estado = models.IntegerField(choices=ESTADO, default=1, blank=True)
-
-    def __str__(self):
-        return f"{self.id} - {self.usuario}"
 
 
 class Almacen(models.Model):
@@ -74,7 +91,7 @@ class CategoriaProducto(models.Model):
 
 class Cliente(models.Model):
     nombre = models.CharField(max_length=255)
-    nit = models.CharField(max_length=255)
+    nit = models.CharField(max_length=255, unique=True)  # El NIT debe ser único
     contacto = models.CharField(max_length=255)
     correo_electronico = models.EmailField(null=True, blank=True)
     direccion = models.CharField(max_length=255, null=True, blank=True)
@@ -82,23 +99,37 @@ class Cliente(models.Model):
     def __str__(self):
         return f"{self.nombre}"
 
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 class ProductoTerminado(models.Model):
-    nombre = models.CharField(max_length=255)
+    nombre = models.CharField(max_length=255, validators=[
+        RegexValidator(regex='^[A-Za-z\s]+$', message='El nombre debe contener solo letras y espacios.')
+    ])
     categorias = models.ForeignKey(CategoriaProducto, on_delete=models.DO_NOTHING)
     unidad_medida = models.CharField(max_length=50)
-    lote = models.CharField(max_length=50)
+    lote = models.CharField(max_length=50, validators=[
+        RegexValidator(regex='^[A-Za-z0-9\-]+$', message='El lote debe contener solo letras, números y guiones.')
+    ])
     fecha_vencimiento = models.DateField(null=True, blank=True)
-    cantidad = models.CharField(max_length=50, null=True)
-    precio = models.CharField(max_length=50, null=True)
+
+    cantidad = models.PositiveIntegerField(validators=[MinValueValidator(0)], null=True)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], null=True)
+
     foto = models.ImageField(default='fotos/default.png', upload_to='fotos_productos/')
+
+    def clean(self):
+        # Validar que la fecha de vencimiento no sea anterior a la fecha actual
+        if self.fecha_vencimiento and self.fecha_vencimiento < timezone.now().date():
+            raise ValidationError("La fecha de vencimiento no puede ser anterior a la fecha actual.")
 
     def __str__(self):
         return self.nombre
 
 
+
 class Pedido(models.Model):
-    clientes = models.ForeignKey(Cliente, on_delete=models.DO_NOTHING)
+    clientes = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
     cantidad = models.IntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -106,11 +137,30 @@ class Pedido(models.Model):
     fecha_pedido = models.DateField()
     
 
-class Devolucion(models.Model):
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
+
+
+class Devolucion(models.Model): 
     fecha_devolucion = models.DateTimeField(auto_now_add=True)
-    motivo = models.CharField(max_length=255, null=True, blank=True)
+    motivo = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        validators=[
+            RegexValidator(regex='^[A-Za-z\s]+$', message='El motivo debe contener solo letras y espacios')
+        ]
+    )
     foto = models.ImageField(default='fotos/default.png', upload_to='fotos/fotos_productos/')
     productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
+
+    def clean(self):
+        # Validar que el archivo sea una imagen válida
+        if self.foto:
+            if not self.foto.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                raise ValidationError("Solo se permiten imágenes en formato PNG, JPG o JPEG.")
+        super().clean()
+
     
 
 class Proveedor(models.Model):

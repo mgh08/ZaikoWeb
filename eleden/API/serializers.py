@@ -75,9 +75,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
 		model = Usuario
 		fields = '__all__'
 
-class ventaSoftwareSerializer(serializers.ModelSerializer):
+class VentaSoftwareSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = ventaSoftware
+		model = VentaSoftware
 		fields = '__all__'
 
 
