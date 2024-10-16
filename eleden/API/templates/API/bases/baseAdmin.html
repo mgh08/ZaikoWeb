@@ -60,7 +60,7 @@
             </li>
             <!--Carrito-->
             <li class="nav-item">
-                <a onclick="ver_carrito(`{% url 'ver_carrito' %}`)" class="nav-link position-relative" href="" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                <a onclick="ver_carrito(`{% url 'carrito_ver' %}`)" class="nav-link position-relative" href="" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                     <i class="fa-solid fa-cart-flatbed"></i>
                     <span class="position-relative top-0 start-75 translate-middle badge rounded-pill bg-danger" style="margin-left:0.5rem;">{{ request.session.items_carrito|default:0 }}</span>
                 </a>

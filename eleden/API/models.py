@@ -21,33 +21,6 @@ class VentaSoftware(models.Model):
     def __str__(self):
         return f"{self.nombre}"
 
-class Compra(models.Model):
-    fecha = models.DateTimeField(auto_now_add=True)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)  # Cambia aquí
-    ESTADO = (
-        (1, "Creado"),
-        (2, "Enviado"),
-        (3, "Cancelado"),
-    )
-    estado = models.IntegerField(choices=ESTADO, default=1, blank=True)
-
-    def __str__(self):
-        return f"{self.id} - {self.usuario}"
-
-class ItemCompra(models.Model):
-    compra = models.ForeignKey(Compra, on_delete=models.CASCADE)
-    venta_software = models.ForeignKey(VentaSoftware, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
-
-    @property
-    def subtotal(self):
-        return self.venta_software.subtotal(self.cantidad)
-
-    
-
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-from django.core.validators import MinLengthValidator
 
 class Usuario(AbstractUser):
     username = None
@@ -68,6 +41,32 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return f"{self.nombreCompleto} - {self.rol}"
+
+class Venta(models.Model):
+	fecha_venta = models.DateTimeField(auto_now=True)
+	usuario = models.ForeignKey(Usuario, on_delete=models.DO_NOTHING)
+	ESTADOS = (
+		(1, 'Pendiente'),
+		(2, 'Enviado'),
+		(3, 'Rechazada'),
+	)
+	estado = models.IntegerField(choices=ESTADOS, default=1)
+
+	def __str__(self):
+		return f"{self.id} - {self.usuario}"
+
+
+class DetalleVenta(models.Model):
+	venta = models.ForeignKey(Venta, on_delete=models.DO_NOTHING)
+	producto = models.ForeignKey(VentaSoftware, on_delete=models.DO_NOTHING)
+	cantidad = models.IntegerField()
+	precio_historico = models.IntegerField()
+
+	def __str__(self):
+		return f"{self.id} - {self.venta}"
+   
+
+
 
 
 class Almacen(models.Model):
@@ -126,15 +125,19 @@ class ProductoTerminado(models.Model):
     def __str__(self):
         return self.nombre
 
-
-
+    
 class Pedido(models.Model):
-    clientes = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    productos = models.ForeignKey(ProductoTerminado, on_delete=models.DO_NOTHING)
-    cantidad = models.IntegerField()
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    precio_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     fecha_pedido = models.DateField()
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class PedidoProducto(models.Model):
+    pedido = models.ForeignKey(Pedido, related_name="productos", on_delete=models.CASCADE)
+    producto = models.ForeignKey(ProductoTerminado, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    precio_total = models.DecimalField(max_digits=10, decimal_places=2)
+
     
 
 from django.core.exceptions import ValidationError
