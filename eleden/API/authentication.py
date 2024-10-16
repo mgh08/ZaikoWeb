@@ -1,39 +1,37 @@
 from django.contrib.auth.base_user import BaseUserManager
 
-from rest_framework import authentication
-from rest_framework import exceptions
+from django.contrib.auth.models import BaseUserManager
+from django.utils.translation import gettext_lazy as _
 
 class CustomUserManager(BaseUserManager):
     """
-    Custom user model manager where email is the unique identifiers
-    for authentication instead of usernames.
+    Custom user model manager where `usuario` is used as the unique identifier
+    for authentication instead of `username`.
     """
-    def create_user(self, usuario, password, **extra_fields):
+    def create_user(self, usuario, password=None, **extra_fields):
         """
-        Create and save a User with the given email and password.
+        Create and save a regular User with the given `usuario` and password.
         """
-        print("Creando un usuario....")
-        print(password)
-        print(extra_fields)
         if not usuario:
-            raise ValueError(_('The Email must be set'))
-        #email = self.normalize_email(extra_fields["email"])
+            raise ValueError(_('El campo "usuario" debe estar definido'))
+        
         user = self.model(usuario=usuario, **extra_fields)
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
         return user
 
-    def create_superuser(self, usuario, password, **extra_fields):
+    def create_superuser(self, usuario, password=None, **extra_fields):
         """
-        Create and save a SuperUser with the given email and password.
+        Create and save a SuperUser with the given `usuario` and password.
         """
-        print("Creando un SUPER usuario....")
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError(_('Superuser must have is_staff=True.'))
+            raise ValueError(_('El superusuario debe tener is_staff=True'))
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError(_('Superuser must have is_superuser=True.'))
+            raise ValueError(_('El superusuario debe tener is_superuser=True'))
+
         return self.create_user(usuario, password, **extra_fields)
+

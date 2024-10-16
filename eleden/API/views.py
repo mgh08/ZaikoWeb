@@ -1464,15 +1464,14 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
-
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['username']
-        # traer datos del usuario para bienvenida y ROL
-        usuario = Usuario.objects.get(usuario=user)
+        
+        # Aquí estamos accediendo al campo `usuario` en lugar de `username`
+        usuario = serializer.validated_data['username']
+        usuario = Usuario.objects.get(usuario=usuario)
         token, created = Token.objects.get_or_create(user=usuario)
 
         return Response({
@@ -1485,6 +1484,7 @@ class CustomAuthToken(ObtainAuthToken):
                 'foto': usuario.foto.url
             }
         })
+
 
 def auditoria(request):
     return render(request, 'API/auditoria/auditoria.html')
