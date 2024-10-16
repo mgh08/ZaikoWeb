@@ -4,29 +4,39 @@
 
 {% block contenido %}
 
-<div class="d-flex justify-content-center align-items-center vh-100">
-<div class="col-3 card p-5">
-    <form class="form form-register" action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        <br>
-        <div>
-            <label>
-                <i class="fa-solid fa-user"></i>
-                <input type="text" placeholder="Nombre Usuario" name="usuario" autocomplete="off">
-            </label>
+<div class="contenedorCentrado" style="margin-top: 150px; margin-bottom: 50px;">
+    <div class="container-form">
+        <div class="information">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="Logo">
+                <h2>¡Iniciar Sesión!</h2>
+                <p>Por favor, ingresa tus credenciales para continuar.</p>
+            </div>
         </div>
-        <div>
-            <label>
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" placeholder="Contraseña" name="clave" autocomplete="off">
-            </label>
+        <div class="form-information">
+            <div class="form-information-childs">
+                <form class="form form-register" action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <br>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" placeholder="Nombre Usuario" name="usuario" autocomplete="off" required>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Contraseña" name="clave" autocomplete="off" required>
+                        </label>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+            </div>
         </div>
-        <br>
-        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-        <br>
     </div>
-    </form>
 </div>
-</div>
+
 
 {% endblock %}

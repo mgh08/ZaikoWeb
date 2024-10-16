@@ -4,17 +4,32 @@
 
 {% block contenido %}
 
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="col-3 card p-5">
-        <form action="{% url 'recuperar_clave_form' %}" method="post">
-            {% csrf_token %}
-            <label for="c">Digite su correo:</label>
-            <br>
-            <input id="c" type="email" name="correo" class="form-control" required/>
-            <br>
-            <button type="submit" class="btn btn-primary mt-3">Enviar</button>
-        </form>
-        
+<div class="contenedorCentrado" style="margin-top: 150px; margin-bottom: 50px;">
+    <div class="container-form">
+        <div class="information">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="Logo">
+                <h2>¡Recuperación de Clave!</h2>
+                <p>Introduce tu correo para recibir instrucciones.</p>
+            </div>
+        </div>
+        <div class="form-information">
+            <div class="form-information-childs">
+                <h2>Recuperar Clave</h2>
+                <form action="{% url 'recuperar_clave_form' %}" method="post" class="form">
+                    {% csrf_token %}
+                    <br>
+                    <div>
+                        <p for="c">Digite su correo:</p>
+                        <input id="c" type="email" name="correo" class="form-control" required/>
+                        <br>
+                    </div>
+                    <div class="btn-Login">
+                        <button type="submit" class="btn btn-primary mt-3">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

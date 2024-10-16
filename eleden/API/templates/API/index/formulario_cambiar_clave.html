@@ -3,23 +3,41 @@
 
 {% block contenido %}
 
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-5 col-3 text-center">
-        <form action="{% url 'recuperar_clave_form' %}" method="POST">
-            {% csrf_token %}
-            <label>Clave actual</label>
-            <br>
-            <input type="password" required="" name="actual" autofocus="" class="form-control"><br>
-            <label>Nueva Clave</label>
-            <br>
-            <input type="password" required="" name="nueva1" class="form-control">
-            <label>Repetir Clave</label>
-            <br>
-            <input type="password" required="" name="nueva2" class="form-control"><br>
-            <button type="submit" class="btn btn-info">Guardar</button>
-        </form>        
+<div class="contenedorCentrado" style="margin-top: 150px; margin-bottom: 50px;">
+    <div class="container-form">
+        <div class="information">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="Logo">
+                <h2>¡Cambio de Clave!</h2>
+                <p>Por favor, introduce tu nueva clave.</p>
+            </div>
+        </div>
+        <div class="form-information">
+            <div class="form-information-childs">
+                <h2>Actualizar Clave</h2>
+                <form action="{% url 'recuperar_clave_form' %}" method="POST" class="form">
+                    {% csrf_token %}
+                    <br>
+                    <div>
+                        <label>Clave actual</label>
+                        <input type="password" required="" name="actual" autofocus="" class="form-control"><br>
+                    </div>
+                    <div>
+                        <label>Nueva Clave</label>
+                        <input type="password" required="" name="nueva1" class="form-control"><br>
+                    </div>
+                    <div>
+                        <label>Repetir Clave</label>
+                        <input type="password" required="" name="nueva2" class="form-control"><br>
+                    </div>
+                    <div class="btn-Login">
+                        <button type="submit" class="btn btn-info">Guardar</button>
+                    </div>
+                </form>        
+            </div>
+        </div>
     </div>
 </div>
 
-
 {% endblock %}
+
