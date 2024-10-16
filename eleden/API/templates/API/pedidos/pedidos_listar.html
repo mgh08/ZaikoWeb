@@ -22,7 +22,9 @@
                         <th scope="col">Precio Total</th>
                         <th scope="col">Cliente</th>
                         <th scope="col">Fecha del Pedido</th>
-                        <th scope="col">Acciones</th>
+                        {% if request.session.logueo.rol == "GEREN" %}
+                            <th scope="col">Acciones</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -39,14 +41,13 @@
                         <td>{{ pedido.precio_total|floatformat:2 }}</td>
                         <td>{{ pedido.cliente.nombre }}</td>
                         <td>{{ pedido.fecha_pedido }}</td>
-                        <td>
-                            <a class="btn btn-warning btn-sm" href="{% url 'pedidos_formulario_editar' pedido.id %}">
-                                <i class="fa-solid fa-pen-to-square"></i> Editar
-                            </a>
-                            <a class="btn btn-danger btn-sm" href="javascript:confirmar_eliminar('{% url 'pedidos_eliminar' pedido.id %}')">
-                                <i class="fa-solid fa-trash"></i> Eliminar
-                            </a>
-                        </td>
+                        {% if request.session.logueo.rol == "GEREN" %}
+                            <td>
+                                <a class="btn btn-danger btn-sm" href="javascript:confirmar_eliminar('{% url 'pedidos_eliminar' pedido.id %}')">
+                                    <i class="fa-solid fa-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>

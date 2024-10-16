@@ -3,7 +3,7 @@
 
 {% block contenido %}
 <section class="tablas tablas-formularios">
-    <form action="{% url 'pedidos_guardar' %}" method="post">
+    <form action="{% url 'pedidos_guardar' %}" id="pedidoForm" method="POST" onsubmit="confirmar_guardar(event)">
         {% csrf_token %}
         <div class="regresar">
             <h1 class="title-tablas">Crear o Actualizar Pedidos</h1>
@@ -135,6 +135,32 @@
                 }
             });
         });
+
+        function confirmar_guardar(event) {
+            event.preventDefault(); // Evitar el envío del formulario por defecto
+        
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Una vez guardado, no podrás modificar este pedido.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, guardar pedido',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Enviar el formulario manualmente si se confirma
+                    document.getElementById("pedidoForm").submit();
+                } else {
+                    Swal.fire(
+                        'Cancelado',
+                        'El pedido no ha sido guardado.',
+                        'info'
+                    );
+                }
+            });
+        }
         
     </script>
         

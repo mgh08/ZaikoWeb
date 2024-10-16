@@ -17,6 +17,7 @@
             <thead>
                 <tr>
                     <th>Producto</th>
+                    <th>Cantidad</th>
                     <th>Subtotal</th>
                     <th>Eliminar</th>
                 </tr>
@@ -25,12 +26,15 @@
                 {% for p in data  %}
                 <tr>
                     <td>
-                        <img src="{{ p.foto.url }}" width="20%" />
+                        <img src="{{ p.foto.url }}" width="25%" />
                         <br>
                         {{ p.nombre }}<br>Precio: <strong>${{ p.precio|intcomma }}</strong>
                     </td>
+                    <td>{{ p.stock }}</td>
                     <td id="subtotal">${{ p.subtotal|intcomma }}</td>
-                    <td><a href="javascript:del_item_carrito({% url 'eliminar_item_carrito' p.id %});"><i class="fa-solid fa-circle-xmark"></i></a></td>
+                    <td>
+                        <a class="btn btn-danger" href="javascript:eliminar_item_carrito(`{% url 'eliminar_item_carrito' p.id %}`);">X</a>
+                    </td>                   
                 </tr>
                 {% endfor %}
             </tbody>
@@ -44,22 +48,40 @@
     </div>
 
 <script>
-    function del_item_carrito(ruta){
-        r = $("#offcanvasRight")
+    function eliminar_item_carrito(url){
+        contenido = $("#offcanvasRight")
+        items_carrito = $("#items_carrito")
+        loader = $("#loader")
+    
+        loader.removeClass("d-none");
+        loader.addClass("d-block");
     
         $.ajax({
-            method: "GET",
-            url: ruta
+            url: url
         })
-        .done(function( respuesta ) {
-            r.html(respuesta);
-            quitar_alertas();
-            // abrir offcanvas
-            // offcanvas = $("#offcanvasRight").offcanvas('toggle');
+        .done(function(respuesta){
+    
+            if (respuesta != "Error"){
+    
+                loader.removeClass("d-block");
+                loader.addClass("d-none");
+                // Pintar respuesta en offCanvas
+                contenido.html(respuesta);
+    
+                //Buscar items en html resultante
+                let position_ini = respuesta.search(" ");
+                let position_final = respuesta.search("</h1>");
+                let result = respuesta.substring(position_ini+2, position_final-1);
+                items_carrito.html(result);
+            }
+            else{
+                location.href="carrito/carrito.html";
+            }
         })
-        .fail(function() {
-            alert( "error" );
+        .fail(function(respuesta){
+            location.href="/tienda/";
         });
     }
+    
 </script>
 {% comment %} <script src="{% static 'API/js/libreria.js' %}"></script> {% endcomment %}
