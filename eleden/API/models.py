@@ -21,12 +21,12 @@ class VentaSoftware(models.Model):
     def __str__(self):
         return f"{self.nombre}"
 
-
 class Usuario(AbstractUser):
-    username = None
+    username = None  # No se usará el campo `username` por defecto
     nombreCompleto = models.CharField(max_length=254)
     usuario = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=254, validators=[MinLengthValidator(8)])  # Mínimo 8 caracteres
+
     ROLES = (
         ("ADMIN", "Administrador"),
         ("GEREN", "Gerente"),
@@ -36,8 +36,10 @@ class Usuario(AbstractUser):
     foto = models.ImageField(upload_to="fotos/", default="fotos/default.png")
     token = models.CharField(max_length=10, null=True, blank=True)
 
-    USERNAME_FIELD = "usuario"
-    REQUIRED_FIELDS = ["nombreCompleto"]
+    USERNAME_FIELD = "usuario"  # Campo que se usará para autenticación
+    REQUIRED_FIELDS = ["nombreCompleto"]  # Campos adicionales requeridos
+
+    objects = CustomUserManager()  # Vinculamos el CustomUserManager
 
     def __str__(self):
         return f"{self.nombreCompleto} - {self.rol}"
