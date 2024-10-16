@@ -125,7 +125,163 @@ function quitar_alertas(){
     }, 1000);
 }
 
-function add_carrito(url, producto_id) {
+
+
+function add_carrito(url, id_producto) {
+    console.log(url)
+    console.log(id_producto)
+    const csrf_token = document.querySelector("[name='csrfmiddlewaretoken']").value;
+    const id = document.getElementById(`id_producto`).value;
+    const cantidad = document.getElementById(`cantidad_${id_producto}`).value;
+    const items_carrito = document.getElementById("items_carrito");
+    console.log(id)
+    // Mostrar loader
+    const loader = document.getElementById("loader");
+    loader.classList.remove("d-none");
+    loader.classList.add("d-block");
+
+    // Mostrar carrito offCanvas
+    const offCanvas_carrito = new bootstrap.Offcanvas(document.getElementById("offcanvasRight"));
+    offCanvas_carrito.show();
+
+    // Realizar la solicitud AJAX con el método POST
+    $.ajax({
+        url: url,
+        type: "POST",  // Método POST
+        data: {
+            "csrfmiddlewaretoken": csrf_token,
+            "id": id,
+            "cantidad": cantidad
+        },
+    })
+    .done(function(respuesta) {
+        if (respuesta != "Error") {
+            loader.classList.remove("d-block");
+            loader.classList.add("d-none");
+
+            // Actualizar el contenido del carrito
+            const contenido = document.getElementById("respuesta_carrito");
+            contenido.innerHTML = respuesta;
+
+            // Actualizar los ítems del carrito
+            const position_ini = respuesta.search(" ");
+            const position_final = respuesta.search("</h1>");
+            const result = respuesta.substring(position_ini + 2, position_final - 1);
+            items_carrito.innerHTML = result;
+        } else {
+            location.href = "API/carrito/tienda/";
+        }
+    })
+    .fail(function(respuesta) {
+        location.href = "API/carrito/tienda/";
+    });
+}
+
+
+
+function ver_carrito(url){
+    // Capturo referencia a dom de carrito del offCanvas
+    contenido = $("#respuesta_carrito")
+    loader = $("#loader")
+
+    loader.removeClass("d-none");
+    loader.addClass("d-block");
+
+    offCanvas_carrito = $("#offcanvasRight");
+    offCanvas_carrito.offcanvas('toggle');
+
+    $.ajax({
+        url: url
+    })
+    .done(function(respuesta){
+
+        if (respuesta != "Error"){
+            /*setTimeout(()=>{
+                loader.removeClass("d-block");
+                loader.addClass("d-none");
+                // Pintar respuesta en offCanvas
+                contenido.html(respuesta);
+            }, 3000);*/
+
+            loader.removeClass("d-block");
+            loader.addClass("d-none");
+            // Pintar respuesta en offCanvas
+            contenido.html(respuesta);
+
+        }
+        else{
+            location.href="API/carrito/tienda/";
+        }
+    })
+    .fail(function(respuesta){
+        location.href="API/carrito/tienda/";
+    });
+}
+
+function eliminar_item_carrito(url) {
+    console.log("URL a la que se envía la petición:", url); // Depurar URL
+    contenido = $("#respuesta_carrito");
+    items_carrito = $("#items_carrito");
+    loader = $("#loader");
+
+    loader.removeClass("d-none");
+    loader.addClass("d-block");
+
+    $.ajax({
+        url: url
+    })
+    .done(function(respuesta){
+        if (respuesta != "Error") {
+            loader.removeClass("d-block");
+            loader.addClass("d-none");
+            contenido.html(respuesta);
+
+            // Buscar items en html resultante
+            let position_ini = respuesta.search(" ");
+            let position_final = respuesta.search("</h1>");
+            let result = respuesta.substring(position_ini + 2, position_final - 1);
+            items_carrito.html(result);
+        } else {
+            location.href = "API/carrito/tienda/";
+        }
+    })
+    .fail(function(respuesta) {
+        location.href = "API/carrito/tienda/";
+    });
+}
+
+function actualizar_totales_carrito(url, id){
+    contenido = $("#respuesta_carrito")
+    loader = $("#loader")
+    cantidad = $("#cantidad_carrito_"+id)
+
+    loader.removeClass("d-none");
+    loader.addClass("d-block");
+
+    $.ajax({
+        url: url,
+        type: "GET",
+        data: {"cantidad": cantidad.val()}
+    })
+    .done(function(respuesta){
+
+        if (respuesta != "Error"){
+
+            loader.removeClass("d-block");
+            loader.addClass("d-none");
+            // Pintar respuesta en offCanvas
+            contenido.html(respuesta);
+        }
+        else{
+            location.href="API/carrito/tienda/";
+        }
+    })
+    .fail(function(respuesta){
+        location.href="API/carrito/tienda/";
+    });
+}
+
+function add_carrito1(url, producto_id) {
     console.log('Agregando al carrito:', producto_id);  // Verificación
     const cantidad = document.getElementById(`cantidad_${producto_id}`).value; 
 

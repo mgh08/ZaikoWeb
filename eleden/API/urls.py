@@ -96,13 +96,6 @@ urlpatterns = [
     path("proveedores_actualizar/", views.proveedores_actualizar,name="proveedores_actualizar"),
     path("proveedores_eliminar/<int:id>/", views.proveedores_eliminar, name="proveedores_eliminar"),
 
-    # #materia prima
-    # path("registrarMateriaPrima/", views.registrarMateriaPrima, name='registrarMateriaPrima'),
-    # path("materiaPrima/",views.materiaPrima, name="materiaPrima"),
-    # #path("materia_prima_guardar/",views.materia_prima_guardar, name="materia_prima_guardar"),
-    # path("materia_prima_editar/<int:id>/",views.materia_prima_editar, name="materia_prima_editar"),
-    # path("materia_prima_actualizar/",views.materia_prima_actualizar, name="materia_prima_actualizar"),
-    # path("materia_prima_eliminar/<int:id>/",views.materia_prima_eliminar, name="materia_prima_eliminar"),
 
     #productos
     path("registrar_producto/", views.registrar_producto, name="registrar_producto"), #posible eliminacion
@@ -133,11 +126,9 @@ urlpatterns = [
 	path("pedidos_actualizar/", views.pedidos_actualizar, name="pedidos_actualizar"),
     path("pedidos_eliminar/<int:id>/",views.pedidos_eliminar,name="pedidos_eliminar"),
 
-    # Carrito
-    path("ver_carrito/", views.ver_carrito, name='ver_carrito'),
-    path('carrito_add/<int:producto_id>/', views.carrito_add, name='agregar_al_carrito'),
-    # path('carrito_add/<int:producto_id>/', views.agregar_al_carrito, name='carrito_add'),
-    # path('carrito_add/', views.carrito_add, name='carrito_add'),
+    #carrito
+    path("carrito_ver/", views.carrito_ver, name="carrito_ver"),
+    path("carrito_add/", views.carrito_add, name='carrito_add'),
     path("eliminar_item_carrito/<int:id_producto>/", views.eliminar_item_carrito, name='eliminar_item_carrito'),
     path("guardar_compra/", views.guardar_compra, name='guardar_compra'),
     path("vaciar_carrito/", views.vaciar_carrito, name='vaciar_carrito'),

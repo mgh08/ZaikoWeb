@@ -863,50 +863,95 @@ def pedidos_listar(request):
     return render(request, 'API/pedidos/pedidos_listar.html', context)
 
 def pedidos_formulario(request):
-    return render(request, "API/pedidos/pedidos_formulario.html")
+    c = Cliente.objects.all()
+    p = ProductoTerminado.objects.all()
+    context = {
+        "clientes": c,
+        "productos": p,
+               }
+    return render(request, "API/pedidos/pedidos_formulario.html", context)
+
+from django.db import transaction
+from django.contrib import messages
 
 def pedidos_guardar(request):
     if request.method == "POST":
-        cliente_nombre = request.POST.get("clientes")
-        cantidad = request.POST.get("cantidad")
-        precio_unitario = request.POST.get("precio_unitario")
+        cliente_id = request.POST.get("cliente")
         fecha_pedido = request.POST.get("fecha_pedido")
-        producto_nombre = request.POST.get("productos")
-        
+        productos_ids = request.POST.getlist("producto[]")
+        cantidades = request.POST.getlist("cantidad[]")
+        precios_unitarios = request.POST.getlist("precio_unitario[]")
+
+        # Validar si el cliente existe
         try:
-            cliente = Cliente.objects.get(nombre=cliente_nombre)
+            cliente = Cliente.objects.get(id=cliente_id)
         except Cliente.DoesNotExist:
-            messages.error(request, f"Cliente con nombre '{cliente_nombre}' no encontrado")
+            messages.error(request, "Cliente no encontrado")
             return redirect("pedidos_formulario")
-        
+
+        # Inicializamos el total del pedido
+        precio_total = 0
+
+        # Utilizamos una transacción para asegurar que todo el proceso se realice de manera segura
         try:
-            producto = ProductoTerminado.objects.get(nombre=producto_nombre)
-        except ProductoTerminado.DoesNotExist:
-            messages.error(request, f"Producto con nombre '{producto_nombre}' no encontrado")
-            return redirect("pedidos_formulario")
-        
-        try:
-            cantidad = int(cantidad)
-            precio_unitario = float(precio_unitario)
-            precio_total = cantidad * precio_unitario
-            
-            pedido = Pedido(
-                clientes=cliente,
-                productos=producto,
-                cantidad=cantidad,
-                precio_unitario=precio_unitario,
-                precio_total=precio_total,
-                fecha_pedido=fecha_pedido
-            )
-            pedido.save()
-            messages.success(request, "Pedido guardado correctamente!!")
-            return redirect("pedidos_listar")
+            with transaction.atomic():
+                # Creamos el pedido
+                pedido = Pedido(cliente=cliente, fecha_pedido=fecha_pedido, precio_total=0)
+                pedido.save()
+
+                # Recorrer los productos seleccionados y añadirlos al pedido
+                for i in range(len(productos_ids)):
+                    producto_id = productos_ids[i]
+                    cantidad = int(cantidades[i])
+                    precio_unitario = float(precios_unitarios[i])
+
+                    # Validar si el producto existe
+                    try:
+                        producto = ProductoTerminado.objects.get(id=producto_id)
+                    except ProductoTerminado.DoesNotExist:
+                        messages.error(request, "Producto no encontrado")
+                        return redirect("pedidos_formulario")
+
+                    # Verificar si el stock es suficiente
+                    if producto.cantidad < cantidad:
+                        messages.error(request, f"No hay suficiente cantidad para {producto.nombre}. Stock disponible: {producto.cantidad}")
+                        return redirect("pedidos_formulario")
+
+                    # Calcular el subtotal del producto
+                    subtotal = cantidad * precio_unitario
+
+                    # Actualizar el precio total del pedido
+                    precio_total += subtotal
+
+                    # Crear un detalle de pedido
+                    PedidoProducto.objects.create(
+                        pedido=pedido,
+                        producto=producto,
+                        cantidad=cantidad,
+                        precio_total=subtotal
+                    )
+
+                    # Reducir el cantidad del producto
+                    producto.cantidad -= cantidad
+                    producto.save()
+
+                # Actualizar el precio total del pedido
+                pedido.precio_total = precio_total
+                pedido.save()
+
+                messages.success(request, "Pedido guardado correctamente")
+                return redirect("pedidos_listar")
+
         except Exception as e:
-            messages.error(request, f"Error al guardar el pedido: {e}")
+            # Si ocurre algún error en la transacción, devolver al formulario y mostrar el error
+            messages.error(request, f"Ocurrió un error al guardar el pedido: {str(e)}")
             return redirect("pedidos_formulario")
+
     else:
-        messages.warning(request, "No se enviaron datos...")
+        messages.warning(request, "No se enviaron datos")
         return redirect("pedidos_formulario")
+
+
 
 
 def pedidos_formulario_editar(request, id):
@@ -935,7 +980,7 @@ def pedidos_actualizar(request):
             try:
                 producto = ProductoTerminado.objects.get(nombre=nombre_producto)
             except ProductoTerminado.DoesNotExist:
-                messages.error(request, f"Producto con nombre '{nombre_producto}' no encontrado")
+                messages.error(request, f"VentaSoftware con nombre '{nombre_producto}' no encontrado")
                 return redirect("pedidos_formulario")
             
             pedido.clientes = cliente
@@ -1020,99 +1065,164 @@ from django.contrib import messages
 from django.http import HttpResponseNotAllowed, JsonResponse
 from .models import VentaSoftware
 
-# def carrito_add(request, producto_id):
-#     if request.method == 'POST':
-#         # Lógica para agregar el producto al carrito
-#         cantidad = int(request.POST.get('cantidad', 1))
-#         producto = get_object_or_404(VentaSoftware, id=producto_id)
+def carrito_add(request):
+    if request.method == "GET":
+        id_producto = request.GET.get("id_producto")
+        cantidad = int(request.GET.get("cantidad"))
+        q = VentaSoftware.objects.get(pk=id_producto)
+        carrito = request.session.get("carrito", [])
+        if not isinstance(carrito, list):
+            carrito = []
+            request.session["carrito"] = carrito
+            request.session["items_carrito"] = 0
 
-#         # Validaciones
-#         if cantidad <= 0:
-#             messages.error(request, "La cantidad debe ser mayor a cero.")
-#             return redirect('tienda')
-
-#         if producto.stock < cantidad:
-#             messages.error(request, f"Solo quedan {producto.stock} unidades disponibles.")
-#             return redirect('tienda')
-
-#         # Agregar al carrito en la sesión
-#         carrito = request.session.get('carrito', {})
-#         if producto_id in carrito:
-#             carrito[producto_id]['cantidad'] += cantidad  # Incrementar la cantidad
-#         else:
-#             carrito[producto_id] = {
-#                 'nombre': producto.nombre,
-#                 'precio': producto.precio,
-#                 'cantidad': cantidad,
-#                 'subtotal': producto.precio * cantidad  # Calcular subtotal
-#             }
-
-#         # Guardar el carrito en la sesión
-#         request.session['carrito'] = carrito
-#         request.session['items_carrito'] = sum(item['cantidad'] for item in carrito.values())  # Actualizar conteo de items
-
-#         messages.success(request, f"{producto.nombre} agregado al carrito.")
-#         return redirect('tienda')  # Redirigir a la tienda
-
-#     # Si no es una solicitud POST, devolver un error 405 (Método no permitido)
-#     return HttpResponseNotAllowed(['POST'])
-
-def carrito_add(request, producto_id):
-    if request.method == 'POST':  # Solo permitir POST
-        # Obtener la cantidad del formulario o la solicitud
-        cantidad = int(request.POST.get('cantidad', 1))
-
-        # Obtener el producto
-        producto = get_object_or_404(VentaSoftware, id=producto_id)
-
-        # Validar la cantidad y stock
-        if cantidad <= 0 or producto.stock < cantidad:
-            return JsonResponse({"error": "Cantidad no válida o stock insuficiente"}, status=400)
-
-        # Agregar al carrito (a la sesión del usuario)
-        carrito = request.session.get('carrito', {})
-        if producto_id in carrito:
-            carrito[producto_id]['cantidad'] += cantidad
+        for p in carrito:
+            if id_producto == p["id"]:
+                p["cantidad"] += cantidad
+                messages.info(request, "Producto ya existe, cantidad actualizada")
+                break
         else:
-            carrito[producto_id] = {
-                'nombre': producto.nombre,
-                'precio': producto.precio,
-                'cantidad': cantidad
-            }
-        request.session['carrito'] = carrito
-        return JsonResponse({"mensaje": "Producto agregado al carrito"})
+            carrito.append({"id": id_producto, "cantidad": cantidad})
+            messages.success(request, "Producto agregado correctamente!!")
 
-    return HttpResponseNotAllowed(['POST'])  # Si no es POST, devolver error 405
+        request.session["carrito"] = carrito
+        request.session["items_carrito"] = len(carrito)
+
+        return redirect("carrito_ver")
+    else:
+        return HttpResponse("No se enviaron datos...")
+
+@transaction.atomic
+def guardar_compra(request):
+    carrito = request.session.get("carrito", False)
+
+    # capturo variable de sesión para averiguar ID de usuario
+    logueo = request.session.get("logueo", False)
+    u = Usuario.objects.get(pk=logueo["id"])
+    # import traceback
+    try:
+        c = Venta(usuario=u)
+        c.save()
+        print(f"Id compra: {c.id}")
+
+        for p in carrito:
+            try:
+                pro = VentaSoftware.objects.get(pk=p["id"])
+            except VentaSoftware.DoesNotExist:
+                raise Exception(f"No se pudo realizar la compra, El producto {pro} ya no existe..")
+
+            if pro.stock >= p["cantidad"]:
+                dc = DetalleVenta(
+                    id_venta=c,
+                    producto=pro,
+                    cantidad=int(p["cantidad"]),
+                    precio_historico=pro.precio
+                )
+                dc.save()
+                # disminuir inventario
+                pro.stock -= int(p["cantidad"])
+                pro.save()
+            else:
+                raise Exception(f"El producto {pro} no tiene suficiente inventario...")
+
+        # vaciar carrito e items en cero.
+        request.session["carrito"] = []
+        request.session["items_carrito"] = 0
+
+        messages.success(request, "Compra guardada correctamente!!")
+    except Exception as e:
+        # ************* si ERROR **********
+        transaction.set_rollback(True)
+        # rollback
+        messages.warning(request, f"Error: {e}")  # - {traceback.format_exc()}
+
+    return redirect("tienda")
 
 
-def ver_carrito(request):
-    carrito = request.session.get("carrito", {})
-    productos = []
+def carrito_ver(request):
+    carrito = request.session.get("carrito", [])
+
     total = 0
+    productos = []
+    for p in carrito:
+        q = VentaSoftware.objects.get(pk=p["id"])
+        q.stock = p["cantidad"]
+        q.subtotal = int(p["cantidad"]) * q.precio
+        productos.append(q)
+        total += int(q.subtotal)
 
-    # Verifica si el carrito no está vacío
-    if not carrito:
-        messages.info(request, "Tu carrito está vacío.")
-        return render(request, 'API/carrito/carrito.html', {'data': productos, 'total': total})
+    contexto = {"data": productos, "total": total}
+    return render(request, "API/carrito/carrito.html", contexto)
 
-    for id_producto, item in carrito.items():
-        try:
-            # Intenta obtener el producto
-            producto = VentaSoftware.objects.get(pk=id_producto)
-            producto.cantidad = item['cantidad']
-            producto.subtotal = producto.precio * producto.cantidad
-            productos.append(producto)
-            total += producto.subtotal
-        except VentaSoftware.DoesNotExist:
-            # Maneja el caso donde el producto no existe
-            messages.warning(request, f"El producto con ID {id_producto} no existe en la base de datos. Se eliminará del carrito.")
-            del carrito[id_producto]  # Eliminar del carrito si no existe
-            request.session['carrito'] = carrito  # Actualizar la sesión
-        except Exception as e:
-            messages.error(request, f"Ocurrió un error: {str(e)}")
 
-    return render(request, 'API/carrito/carrito.html', {'data': productos, 'total': total})
 
+def vaciar_carrito(request):
+    carrito = request.session.get("carrito", False)
+    try:
+        # vaciar lista....
+        carrito.clear()
+
+        request.session["carrito"] = carrito
+        request.session["items_carrito"] = 0
+        messages.success(request, "Ya no hay items en el carrito!!")
+    except Exception as e:
+        messages.error(request, "Ocurrió un error, intente de nuevo...")
+
+    return redirect("tienda")
+
+def eliminar_item_carrito(request, id_producto):
+    carrito = request.session.get("carrito", False)
+    for i, p in enumerate(carrito):
+        if id_producto == int(p["id"]):
+            carrito.pop(i)
+            messages.info(request, "Producto eliminado...")
+            break
+    else:
+        messages.warning(request, "Producto no encontrado...")
+
+    request.session["carrito"] = carrito
+    request.session["items_carrito"] = len(carrito)
+    return redirect("carrito_ver")
+
+
+
+
+def actualizar_totales_carrito(request, id_producto):
+	carrito = request.session.get("carrito", False)
+	cantidad = request.GET.get("cantidad")
+
+	if carrito != False:
+		for i, item in enumerate(carrito):
+			if item["id"] == id_producto:
+				item["cantidad"] = int(cantidad)
+				item["subtotal"] = int(cantidad) * item["precio"]
+				break
+		else:
+			messages.warning(request, "No se encontró el ítem en el carrito.")
+
+	request.session["items"] = len(carrito)
+	request.session["carrito"] = carrito
+	return redirect("carrito_ver")
+
+
+
+def prueba_correo(request):
+	destinatario = "jor@misena.edu.co"
+	mensaje = """
+		<h1 style='color:blue;'>Tienda virtual</h1>
+		<p>Su pedido está listo y en estado "creado".</p>
+		<p>Tienda ADSO, 2024</p>
+		"""
+
+	try:
+		msg = EmailMessage("Tienda ADSO", mensaje, settings.EMAIL_HOST_USER, [destinatario])
+		msg.content_subtype = "html"  # Habilitar contenido html
+		msg.send()
+		return HttpResponse("Correo enviado")
+	except BadHeaderError:
+		return HttpResponse("Encabezado no válido")
+	except Exception as e:
+		return HttpResponse(f"Error: {e}")
 
 
 def eliminar_item_carrito(request, id_producto):
@@ -1122,11 +1232,11 @@ def eliminar_item_carrito(request, id_producto):
         del carrito[str(id_producto)]
         request.session['carrito'] = carrito
         request.session['items_carrito'] = sum(item['cantidad'] for item in carrito.values())
-        messages.success(request, "Producto eliminado del carrito.")
+        messages.success(request, "VentaSoftware eliminado del carrito.")
     else:
         messages.error(request, "El producto no está en el carrito.")
 
-    return redirect('ver_carrito')
+    return redirect('carrito_ver')
 
 def vaciar_carrito(request):
     request.session['carrito'] = {}
@@ -1142,7 +1252,7 @@ def guardar_compra(request):
     # Validación: Verificar que el carrito no esté vacío
     if not carrito:
         messages.error(request, "El carrito está vacío. No se puede realizar la compra.")
-        return redirect('ver_carrito')
+        return redirect('carrito_ver')
 
     # Validación: Verificar si el usuario está autenticado
     if not request.user.is_authenticated:
@@ -1153,7 +1263,7 @@ def guardar_compra(request):
 
     # Crear la compra
     try:
-        compra = Compra.objects.create(usuario=request.user, fecha=timezone.now(), estado=1)
+        compra = Venta.objects.create(usuario=request.user, fecha=timezone.now(), estado=1)
 
         for producto_id, detalles in carrito.items():
             producto = get_object_or_404(VentaSoftware, id=producto_id)
@@ -1161,10 +1271,10 @@ def guardar_compra(request):
             # Validación de stock
             if producto.stock < detalles['cantidad']:
                 messages.error(request, f"No hay suficiente stock disponible para {producto.nombre}.")
-                return redirect('ver_carrito')
+                return redirect('carrito_ver')
 
             # Guardar detalles de la compra
-            Compra.objects.create(compra=compra, producto=producto, cantidad=detalles['cantidad'], precio=producto.precio)
+            Venta.objects.create(compra=compra, producto=producto, cantidad=detalles['cantidad'], precio=producto.precio)
 
             # Reducir stock
             producto.stock -= detalles['cantidad']
@@ -1174,12 +1284,12 @@ def guardar_compra(request):
         request.session['carrito'] = {}
         request.session['items_carrito'] = 0
 
-        messages.success(request, f"Compra realizada con éxito. Total pagado: ${total_compra}")
+        messages.success(request, f"Venta realizada con éxito. Total pagado: ${total_compra}")
         return redirect('tienda')
 
     except Exception as e:
         messages.error(request, f"Hubo un error al procesar la compra: {str(e)}")
-        return redirect('ver_carrito')
+        return redirect('carrito_ver')
 
 
 def productos_listar_software(request):
@@ -1328,7 +1438,7 @@ def tienda(request):
     logueo = True  # Esto debería ser gestionado adecuadamente
     if logueo:
         productos = VentaSoftware.objects.all()
-        print(productos)  # Agrega esto para depurar
+        print(productos)  # Agrega esto para depurarDanjua
         contexto = {"productos": productos}
         return render(request, 'API/carrito/tienda.html', contexto)
     else:
@@ -1385,12 +1495,6 @@ class AlmacenViewSet(viewsets.ModelViewSet):
     queryset = Almacen.objects.all()
     serializer_class = AlmacenSerializer
 
-# class AlertaStockViewSet(viewsets.ModelViewSet):
-#     authentication_classes = [TokenAuthentication, SessionAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     queryset = AlertaStock.objects.all()
-#     serializer_class = AlertaStockSerializer
-
 
 class CategoriaProductoViewSet(viewsets.ModelViewSet):
     # authentication_classes = [TokenAuthentication, SessionAuthentication]
@@ -1411,20 +1515,6 @@ class DevolucionViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]
     queryset = Devolucion.objects.all()
     serializer_class = DevolucionSerializer
-
-
-# class MateriaPrimaViewSet(viewsets.ModelViewSet):
-#     # authentication_classes = [TokenAuthentication, SessionAuthentication]
-#     # permission_classes = [IsAuthenticated]
-#     queryset = MateriaPrima.objects.all()
-#     serializer_class = MateriaPrimaSerializer
-
-
-# class MovimientoStockViewSet(viewsets.ModelViewSet):
-#     # authentication_classes = [TokenAuthentication, SessionAuthentication]
-#     # permission_classes = [IsAuthenticated]
-#     queryset = MovimientoStock.objects.all()
-#     serializer_class = MovimientoStockSerializer
 
 
 class ProductoTerminadoViewSet(viewsets.ModelViewSet):
@@ -1448,32 +1538,12 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioSerializer
 
 
-# class RecetaViewSet(viewsets.ModelViewSet):
-#     authentication_classes = [TokenAuthentication, SessionAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     queryset = Receta.objects.all()
-#     serializer_class = RecetaSerializer
-
-
-# class DetallePedidoViewSet(viewsets.ModelViewSet):
-#     authentication_classes = [TokenAuthentication, SessionAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     queryset = DetallePedido.objects.all()
-#     serializer_class = DetallePedidoSerializer
-
 
 class PedidoViewSet(viewsets.ModelViewSet):
     # authentication_classes = [TokenAuthentication, SessionAuthentication]
     # permission_classes = [IsAuthenticated]
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
-
-
-# class AlertaStockViewSet(viewsets.ModelViewSet):
-#     authentication_classes = [TokenAuthentication, SessionAuthentication]
-#     permission_classes = [IsAuthenticated]
-#     queryset = AlertaStock.objects.all()
-#     serializer_class = AlertaStockSerializer
 
 
 class VentaSoftwareViewSet(viewsets.ModelViewSet):
