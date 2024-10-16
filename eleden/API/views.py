@@ -953,62 +953,36 @@ def pedidos_guardar(request):
 
 
 
-
-def pedidos_formulario_editar(request, id):
-    pedido = get_object_or_404(Pedido, pk=id)
-    context = {"registro": pedido}
-    return render(request, "API/pedidos/pedidos_formulario.html", context)
-
-
-def pedidos_actualizar(request):
-    if request.method == "POST":
-        id = request.POST.get("id")
-        pedido = get_object_or_404(Pedido, pk=id)       
-        try:
-            cantidad = request.POST.get("cantidad")
-            precio_unitario = request.POST.get("precio_unitario")
-            fecha_pedido = request.POST.get("fecha_pedido")
-            nombre_cliente = request.POST.get("clientes")
-            nombre_producto = request.POST.get("productos")
-            
-            try:
-                cliente = Cliente.objects.get(nombre=nombre_cliente)
-            except Cliente.DoesNotExist:
-                messages.error(request, f"Cliente con nombre '{nombre_cliente}' no encontrado")
-                return redirect("pedidos_formulario")
-            
-            try:
-                producto = ProductoTerminado.objects.get(nombre=nombre_producto)
-            except ProductoTerminado.DoesNotExist:
-                messages.error(request, f"VentaSoftware con nombre '{nombre_producto}' no encontrado")
-                return redirect("pedidos_formulario")
-            
-            pedido.clientes = cliente
-            pedido.productos = producto
-            pedido.cantidad = int(cantidad)
-            pedido.precio_unitario = float(precio_unitario)
-            pedido.precio_total = pedido.cantidad * pedido.precio_unitario
-            pedido.fecha_pedido = fecha_pedido
-            pedido.save()
-            
-            messages.success(request, "Pedido actualizado correctamente!!")
-        except Exception as e:
-            messages.error(request, f"Error al actualizar el pedido: {e}")
-            return redirect("pedidos_formulario")
-        
-        return redirect("pedidos_listar")
-    else:
-        messages.warning(request, "No se enviaron datos...")
-        return redirect("pedidos_formulario")
-
-
 def pedidos_eliminar(request, id):
     try:
-        q = Pedido.objects.get(id=id)
-        q.delete()
-        messages.success(request, f"Se ha eliminado correctamente {q.productos}")
+        # Obtenemos el pedido que se va a eliminar
+        pedido = Pedido.objects.get(id=id)
+
+        # Usamos una transacción para asegurar que las actualizaciones se hagan de manera segura
+        with transaction.atomic():
+            # Obtener todos los detalles del pedido (productos y cantidades)
+            detalles_pedido = PedidoProducto.objects.filter(pedido=pedido)
+
+            # Devolver el stock de cada producto
+            for detalle in detalles_pedido:
+                producto = detalle.producto
+                cantidad_devuelta = detalle.cantidad
+
+                # Incrementamos el stock del producto con la cantidad que estaba en el pedido
+                producto.cantidad += cantidad_devuelta
+                producto.save()
+
+            # Una vez actualizado el stock, eliminamos el pedido
+            pedido.delete()
+
+            messages.success(request, f"El pedido ha sido eliminado correctamente y el stock de los productos ha sido actualizado.")
+
+    except Pedido.DoesNotExist:
+        messages.error(request, "El pedido no existe.")
     except Exception as e:
-        messages.error(request, f"Error {e}")
+        # Si hay algún error, mostrar el mensaje correspondiente
+        messages.error(request, f"Error al eliminar el pedido: {str(e)}")
+
     return redirect("pedidos_listar")
 
 
@@ -1092,6 +1066,51 @@ def carrito_add(request):
     else:
         return HttpResponse("No se enviaron datos...")
 
+# @transaction.atomic
+# def guardar_compra(request):
+#     carrito = request.session.get("carrito", False)
+
+#     # capturo variable de sesión para averiguar ID de usuario
+#     logueo = request.session.get("logueo", False)
+#     u = Usuario.objects.get(pk=logueo["id"])
+#     # import traceback
+#     try:
+#         c = Venta(usuario=u)
+#         c.save()
+#         print(f"Id compra: {c.id}")
+
+#         for p in carrito:
+#             try:
+#                 pro = VentaSoftware.objects.get(pk=p["id"])
+#             except VentaSoftware.DoesNotExist:
+#                 raise Exception(f"No se pudo realizar la compra, El producto {pro} ya no existe..")
+
+#             if pro.stock >= p["cantidad"]:
+#                 dc = DetalleVenta(
+#                     id_venta=c,
+#                     producto=pro,
+#                     cantidad=int(p["cantidad"]),
+#                     precio_historico=pro.precio
+#                 )
+#                 dc.save()
+#                 # disminuir inventario
+#                 pro.stock -= int(p["cantidad"])
+#                 pro.save()
+#             else:
+#                 raise Exception(f"El producto {pro} no tiene suficiente inventario...")
+
+#         # vaciar carrito e items en cero.
+#         request.session["carrito"] = []
+#         request.session["items_carrito"] = 0
+
+#         messages.success(request, "Compra guardada correctamente!!")
+#     except Exception as e:
+#         # ************* si ERROR **********
+#         transaction.set_rollback(True)
+#         # rollback
+#         messages.warning(request, f"Error: {e}")  # - {traceback.format_exc()}
+
+#     return redirect("tienda")
 @transaction.atomic
 def guardar_compra(request):
     carrito = request.session.get("carrito", False)
@@ -1099,11 +1118,13 @@ def guardar_compra(request):
     # capturo variable de sesión para averiguar ID de usuario
     logueo = request.session.get("logueo", False)
     u = Usuario.objects.get(pk=logueo["id"])
-    # import traceback
+
     try:
         c = Venta(usuario=u)
         c.save()
         print(f"Id compra: {c.id}")
+
+        detalle_productos = []
 
         for p in carrito:
             try:
@@ -1122,21 +1143,41 @@ def guardar_compra(request):
                 # disminuir inventario
                 pro.stock -= int(p["cantidad"])
                 pro.save()
+
+                # almacenar el detalle para enviar en el correo
+                detalle_productos.append(f"{pro.nombre} - Cantidad: {p['cantidad']} - Precio: ${pro.precio}")
+
             else:
-                raise Exception(f"El producto {pro} no tiene suficiente inventario...")
+                raise Exception(f"El producto {pro.nombre} no tiene suficiente inventario...")
 
         # vaciar carrito e items en cero.
         request.session["carrito"] = []
         request.session["items_carrito"] = 0
 
-        messages.success(request, "Compra guardada correctamente!!")
+        # *********** ENVÍO DE CORREO ************
+        destinatario = u.email  # Cambia esto según el correo del usuario
+        mensaje = f"""
+            <h1 style='color:blue;'>Tienda Virtual</h1>
+            <p>Su pedido ha sido procesado correctamente.</p>
+            <p><strong>Detalles de la compra:</strong></p>
+            <ul>
+                {''.join([f"<li>{item}</li>" for item in detalle_productos])}
+            </ul>
+            <p>Total de la compra: ${sum([p.precio * p['cantidad'] for p in carrito]):,}</p>
+            <p>Tienda ADSO, 2024</p>
+        """
+        msg = EmailMessage("Confirmación de compra", mensaje, settings.EMAIL_HOST_USER, [destinatario])
+        msg.content_subtype = "html"
+        msg.send()
+
+        messages.success(request, "Compra guardada correctamente y correo enviado!")
     except Exception as e:
         # ************* si ERROR **********
         transaction.set_rollback(True)
-        # rollback
-        messages.warning(request, f"Error: {e}")  # - {traceback.format_exc()}
+        messages.warning(request, f"Error: {e}")
 
     return redirect("tienda")
+
 
 
 def carrito_ver(request):
@@ -1151,7 +1192,7 @@ def carrito_ver(request):
         productos.append(q)
         total += int(q.subtotal)
 
-    contexto = {"data": productos, "total": total}
+    contexto = {"data": productos, "total": total }
     return render(request, "API/carrito/carrito.html", contexto)
 
 
@@ -1171,21 +1212,24 @@ def vaciar_carrito(request):
     return redirect("tienda")
 
 def eliminar_item_carrito(request, id_producto):
-    carrito = request.session.get("carrito", False)
-    for i, p in enumerate(carrito):
-        if id_producto == int(p["id"]):
-            carrito.pop(i)
-            messages.info(request, "Producto eliminado...")
-            break
-    else:
-        messages.warning(request, "Producto no encontrado...")
+    try:
+        carrito = request.session.get("carrito", False)
+        print(carrito)
+        if carrito != False:
+            for i, item in enumerate(carrito):
+                print(f'{type(item["id"])} == {type(id_producto)}')
+                if item["id"] == str(id_producto):
+                    carrito.pop(i)
+                    break
+            else:
+                messages.warning(request, "No se encontró el ítem en el carrito.")
 
-    request.session["carrito"] = carrito
-    request.session["items_carrito"] = len(carrito)
-    return redirect("carrito_ver")
+        request.session["items"] = len(carrito)
+        request.session["carrito"] = carrito
 
-
-
+        return redirect("carrito_ver")
+    except:
+        return HttpResponse("Error")
 
 def actualizar_totales_carrito(request, id_producto):
 	carrito = request.session.get("carrito", False)
@@ -1225,18 +1269,6 @@ def prueba_correo(request):
 		return HttpResponse(f"Error: {e}")
 
 
-def eliminar_item_carrito(request, id_producto):
-    carrito = request.session.get('carrito', {})
-
-    if str(id_producto) in carrito:
-        del carrito[str(id_producto)]
-        request.session['carrito'] = carrito
-        request.session['items_carrito'] = sum(item['cantidad'] for item in carrito.values())
-        messages.success(request, "VentaSoftware eliminado del carrito.")
-    else:
-        messages.error(request, "El producto no está en el carrito.")
-
-    return redirect('carrito_ver')
 
 def vaciar_carrito(request):
     request.session['carrito'] = {}
@@ -1259,7 +1291,8 @@ def guardar_compra(request):
         messages.error(request, "Debes iniciar sesión para realizar una compra.")
         return redirect('login')
 
-    total_compra = sum(item['subtotal'] for item in carrito.values())
+    total_compra = sum(item['subtotal'] for item in carrito)
+
 
     # Crear la compra
     try:

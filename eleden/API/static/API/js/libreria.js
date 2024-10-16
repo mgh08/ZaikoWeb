@@ -1,11 +1,4 @@
-// function confirmar_eliminar(ruta){
-//     if(confirm("Está seguro?")){
-//         location.href = ruta;
-//     }
-//     else{on
-//         alert("Fiuu, te salvaste...")
-//     }
-// }
+
 
 var proveedores = {{ proveedores | safe }}; 
 
@@ -278,28 +271,6 @@ function actualizar_totales_carrito(url, id){
     })
     .fail(function(respuesta){
         location.href="API/carrito/tienda/";
-    });
-}
-
-function add_carrito1(url, producto_id) {
-    console.log('Agregando al carrito:', producto_id);  // Verificación
-    const cantidad = document.getElementById(`cantidad_${producto_id}`).value; 
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ id_producto: producto_id, cantidad: cantidad })
-    }).then(response => {
-        if (response.ok) {
-            alert('Producto agregado al carrito');
-        } else {
-            alert('Hubo un error al agregar el producto al carrito.');
-        }
-    }).catch(error => {
-        console.error('Error:', error);
     });
 }
 

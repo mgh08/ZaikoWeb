@@ -122,14 +122,12 @@ urlpatterns = [
     path("pedidos_formulario/", views.pedidos_formulario, name="pedidos_formulario"),
     path("pedidos_guardar/", views.pedidos_guardar, name="pedidos_guardar"),
     path("pedidos_listar/", views.pedidos_listar, name="pedidos_listar"),
-    path("pedidos_formulario_editar/<int:id>/", views.pedidos_formulario_editar, name="pedidos_formulario_editar"),
-	path("pedidos_actualizar/", views.pedidos_actualizar, name="pedidos_actualizar"),
     path("pedidos_eliminar/<int:id>/",views.pedidos_eliminar,name="pedidos_eliminar"),
 
     #carrito
     path("carrito_ver/", views.carrito_ver, name="carrito_ver"),
     path("carrito_add/", views.carrito_add, name='carrito_add'),
-    path("eliminar_item_carrito/<int:id_producto>/", views.eliminar_item_carrito, name='eliminar_item_carrito'),
+    path('eliminar_item/<int:id_producto>/', views.eliminar_item_carrito, name='eliminar_item_carrito'),
     path("guardar_compra/", views.guardar_compra, name='guardar_compra'),
     path("vaciar_carrito/", views.vaciar_carrito, name='vaciar_carrito'),
     path("tienda/", views.tienda, name='tienda'),
