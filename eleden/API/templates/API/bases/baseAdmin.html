@@ -19,6 +19,14 @@
 
 </head>
 
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark">
         <!-- Navbar Brand-->
@@ -26,46 +34,32 @@
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
         <!-- Navbar Search-->
-        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-            <div class="input-group">
-                <input class="form-control" type="text" placeholder="buscar..." aria-label="Buscar"
-                    aria-describedby="btnNavbarSearch" />
-                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i
-                        class="fas fa-search"></i></button>
-            </div>
-        </form>
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
+        
         <!-- Menu desplegable-->
-        <ul class="d-flex navbar-nav">
+        <ul class="d-flex navbar-nav ms-auto">
+            <!-- Menú desplegable de bienvenida -->
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                   aria-expanded="false">
+                <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Bienvenido <strong>{{ request.session.logueo.nombre }}</strong> ({{ request.session.logueo.rol }})
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#">Perfil</a></li>
-                    <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                <ul class="dropdown-menu">
                     <li>
-                        <hr class="dropdown-divider">
+                        <a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a>
                     </li>
-                    <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
                 </ul>
             </li>
-            <!--Carrito-->
+            
+            <!-- Carrito de compras -->
             <li class="nav-item">
-                <a onclick="ver_carrito(`{% url 'carrito_ver' %}`)" class="nav-link position-relative" href="" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                <a onclick="ver_carrito(`{% url 'carrito_ver' %}`)" class="nav-link position-relative" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                     <i class="fa-solid fa-cart-flatbed"></i>
-                    <span class="position-relative top-0 start-75 translate-middle badge rounded-pill bg-danger" style="margin-left:0.5rem;">{{ request.session.items_carrito|default:0 }}</span>
+                    <span class="position-relative top-0 start-75 translate-middle badge rounded-pill bg-danger" style="margin-left:0.5rem;">
+                        {{ request.session.items_carrito|default:0 }}
+                    </span>
                 </a>
             </li>
         </ul>
+        
 
        
         

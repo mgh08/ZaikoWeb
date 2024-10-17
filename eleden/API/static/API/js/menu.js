@@ -121,4 +121,25 @@ function add_carrito(ruta, id){
     });
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('acceptTerms').addEventListener('click', function () {
+        // Usar SweetAlert2 para mostrar la alerta
+        Swal.fire({
+            title: 'Términos aceptados',
+            text: 'Has aceptado los términos y condiciones.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Cerrar el modal después de aceptar
+                var modal = bootstrap.Modal.getInstance(document.getElementById('termsModal'));
+                modal.hide();
+
+                // Recargar la página
+                location.reload();
+            }
+        });
+    });
+});
+
 
