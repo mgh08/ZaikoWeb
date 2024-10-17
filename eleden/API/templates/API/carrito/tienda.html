@@ -2,47 +2,46 @@
 {% load static %}
 {% block contenido %}
 
-<div class="container_trust container_card-primary">
+<div class="container__trust container__card-primary">
     <section class="trust card__primary">
-        <div class="text_trust text_card-primary" id="paquetes">
+        <div class="text__trust text__card-primary" id="paquetes">
             <h1>GESTIONA TU INVENTARIO</h1>
         </div>
-        <div class="container_trust container_box-cardPrimary">
+        <div class="container__trust container__box-cardPrimary">
 
-                {% if productos %}
-                    {% for p in productos %}
-                        <div class="container__box-cardPrimary">
-                                <div class="card_trust box_card-primary">
-                                    <img src="{{ p.foto.url }}" alt="fotoPorducto">
-                                    <h2>{{ p.nombre }}</h2>
-                                    <p>{{ p.descripcion }}</p>
-                                    <a href="#"><i class="fa-solid fa-angle-right"></i></a>
-                                    <p class="card-text">Precio: <strong>{{ p.precio }}</strong></p>
-                                    {% if p.stock > 0 and p.stock < 5 %}
-                                        <strong class="text-danger">Últimas {{ p.stock }} unidades</strong>
-                                    {% endif %}
-                                    {% if p.stock == 0 %}
-                                        <strong class="text-danger">Producto Agotado</strong>
-                                    {% else %}
-                                        <input type="hidden" value="{{ p.id }}" name="id_producto" id="id_producto_{{ p.id }}">
-                                        <h6>Cantidad</h6>
-                                        <input style="text-align: center;width: 40px;" type="number" size="3" value="1" min="1" max="{{ p.stock }}" name="cantidad" id="cantidad_{{ p.id }}">
-                                        <br>
-                                        <button onclick="add_carrito({% url 'carrito_add' %}, {{ p.id }})" type="button" class="btn btn-info">Agregar Carrito</button>
-                                        <small class="text-body-secondary"></small>
-                                    {% endif %}
-                                </div>
+            {% if productos %}
+                {% for p in productos %}
+                    <div class="container__box-cardPrimary">
+                        <div class="card__trust box__card-primary">
+                            <img src="{{ p.foto.url }}" alt="fotoPorducto">
+                            <h2>{{ p.nombre }}</h2>
+                            <p>{{ p.descripcion }}</p>
+                            <p class="card-text">Precio: <strong>{{ p.precio }}</strong></p>
+                            {% if p.stock > 0 and p.stock < 5 %}
+                                <strong class="text-danger">Últimas {{ p.stock }} unidades</strong>
+                            {% endif %}
+                            {% if p.stock == 0 %}
+                                <strong class="text-danger">Producto Agotado</strong>
+                            {% else %}
+                                <input type="hidden" value="{{ p.id }}" name="id_producto" id="id_producto_{{ p.id }}">
+                                <h6>Cantidad</h6>
+                                <input style="text-align: center;width: 40px;" type="number" size="3" value="1" min="1" max="{{ p.stock }}" name="cantidad" id="cantidad_{{ p.id }}">
+                                <br>
+                                <button onclick="add_carrito(`{% url 'carrito_add' %}`, {{ p.id }})" type="button" class="btn btn-info">Agregar Carrito</button>
+                                <small class="text-body-secondary"></small>
+                            {% endif %}
                         </div>
-                    {% endfor %}
-                {% else %}  
-                    <div class="col">
-                        No hay productos.
                     </div>
-                {% endif %}
+                {% endfor %}
+            {% else %}  
+                <div class="col">
+                    No hay productos.
+                </div>
+            {% endif %}
         </div>
         <br>
         <br>
     </section>
 </div>
 
-{% endblock %}
+{% endblock %}

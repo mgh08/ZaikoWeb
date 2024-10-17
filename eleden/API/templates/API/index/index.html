@@ -11,7 +11,7 @@
                 <br>
                 <h1>¡Registrate!</h1>
                 <br>
-                <p>Sujeto a <a href="#" data-bs-toggle="modal" data-bs-target="#terminos">Terminos</a> y Condiciones.
+                <p>Sujeto a <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terminos</a> y Condiciones.
                 </p>
                 <br>
                 <a class="btn__text" data-bs-toggle="modal" data-bs-target="#register"> ¡Registrate Ahora! </a>
@@ -50,7 +50,7 @@
                 <p>En InfiniteCode, nos especializamos en la gestión de inventarios. Nuestra empresa se enorgullece de
                     ofrecer soluciones de gestión de inventarios muy intuitivas, accesibles económicamente y centradas
                     en el éxito del cliente.</p>
-                <a href="" class="btn-sbns">Saber Más</a>
+                <a data-bs-toggle="modal" data-bs-target="#saberMas" class="btn-sbns">Saber Más</a>
             </div>
 
             <div class="image__about">
@@ -90,8 +90,7 @@
                 </div>
             </div>
             <br>
-            <a href="{% url 'pruebaDemo' %}" class="btn__text" style="width: 250px;height: 70px;margin-bottom: 20px;">Consigue
-                una prueba gratuita</a>
+            <a class="btn__text" data-bs-toggle="modal" data-bs-target="#register" style="width: 250px;height: 70px;margin-bottom: 20px;">Prueba gratuita, regístrate ya!</a>
         </section>
     </div>
     <!--wave Proyectos-->
@@ -482,6 +481,82 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <!-- terminos y condiciones -->
+
+        <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" >
+                    <div class="contenedorModal">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="termsModalLabel">Términos y Condiciones</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Al registrarte en nuestro sitio, aceptas los siguientes términos y condiciones:</p>
+                            <ul>
+                                <li>No se permite el uso indebido de nuestros servicios.</li>
+                                <li>Debes respetar las leyes locales y las normativas vigentes.</li>
+                                <li>No compartiremos tus datos personales con terceros sin tu consentimiento.</li>
+                                <li>Nos reservamos el derecho de actualizar estos términos en cualquier momento.</li>
+                                <li>Al utilizar nuestros servicios, aceptas nuestras políticas de privacidad.</li>
+                            </ul>
+                            <p>Por favor, revisa detenidamente nuestros términos y asegúrate de entenderlos completamente antes de aceptar.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" id="acceptTerms">Acepto</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal saber mas -->
+
+        <div class="modal fade" id="saberMas" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="contenedorModal">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="infoModalLabel">Información Adicional sobre InfiniteCode</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h4>Nuestra Misión</h4>
+                            <p>Proporcionar soluciones de gestión de inventarios que optimicen los procesos de nuestros
+                                clientes,
+                                mejorando la eficiencia y reduciendo costos.</p>
+        
+                            <h4>Características Clave</h4>
+                            <ul>
+                                <li>Gestión de inventarios en tiempo real.</li>
+                                <li>Informes detallados y análisis de datos.</li>
+                                <li>Integraciones con otras plataformas de negocio.</li>
+                                <li>Soporte al cliente 24/7.</li>
+                            </ul>
+        
+                            <h4>Beneficios para Nuestros Clientes</h4>
+                            <p>Con nuestras soluciones, nuestros clientes pueden esperar:</p>
+                            <ul>
+                                <li>Mayor precisión en el seguimiento de inventarios.</li>
+                                <li>Reducción de pérdidas y desperdicios.</li>
+                                <li>Mejor toma de decisiones basadas en datos.</li>
+                                <li>Un aumento en la satisfacción del cliente.</li>
+                            </ul>
+        
+                            <h4>Contáctanos</h4>
+                            <p>Para más información, no dudes en <a href="mailto:info@infinitecode.com">enviarnos un correo</a>
+                                o
+                                llamarnos al 3113413946.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

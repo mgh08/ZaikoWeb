@@ -3,14 +3,32 @@
 
 {% block contenido %}
 
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="col-3 card p-5">
-        <form action="{% url 'verificar_token_form' usuario %}" method="post">
-            {% csrf_token %}
-            <label for="c">Digite el token de seguridad:</label>
-            <input id="c" type="text" name="token" class="form-control" required/>
-            <button type="submit" class="btn btn-primary mt-3">Enviar</button>
-        </form>        
+<div class="contenedorCentrado" style="margin-top: 150px; margin-bottom: 50px;">
+    <div class="container-form">
+        <div class="information">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="Logo">
+                <h2>¡Verificación de Token!</h2>
+                <p>Introduce el token de seguridad para continuar.</p>
+            </div>
+        </div>
+        <div class="form-information">
+            <div class="form-information-childs">
+                <h2>Ingresar Token</h2>
+                <form action="{% url 'verificar_token_form' usuario %}" method="post" class="form">
+                    {% csrf_token %}
+                    <br>
+                    <div>
+                        <p for="c">Digite el token de seguridad:</p>
+                        <input id="c" type="text" name="token" class="form-control" required/>
+                        <br>
+                    </div>
+                    <div class="btn-Login">
+                        <button type="submit" class="btn btn-primary mt-3">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

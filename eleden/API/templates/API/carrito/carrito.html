@@ -10,7 +10,6 @@
 
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasRightLabel">Productos ({{ request.session.items_carrito|default:0 }})</h5>
-        <button type="button" class="btn-close" productos-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
         <table class="table">
@@ -40,10 +39,10 @@
             </tbody>
         </table>
         Total: <strong>${{ total|intcomma }}</strong><br/><br/>
-        <div style="display: flex;flex-direction: column; width: 150px;margin: auto;">
-            <a href="{% url 'vaciar_carrito' %}" class="btn btn-secondary">Vaciar carrito</a>
+        <div style="display: flex;flex-direction: row; justify-content: space-around;">
+            <a href="{% url 'vaciar_carrito' %}" class="btn btn-danger">Vaciar carrito</a>
             <br>
-            <a href="{% url 'guardar_compra' %}" class="btn btn-primary">Comprar</a>
+            <a href="{% url 'guardar_compra' %}" class="btn btn-success">Comprar</a>
         </div>
     </div>
 
