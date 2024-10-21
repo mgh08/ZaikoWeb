@@ -79,7 +79,7 @@
             {% endif %}
             
             <!-- Campo de archivo para cargar una nueva imagen -->
-            <input type="file" class="form-control" name="foto" id="foto" accept="image/*">
+            <input type="file" class="form-control" name="foto" id="foto" accept="image/png, image/jpeg, image/jpg">
         </div>
         <div>
             <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>

@@ -1016,10 +1016,28 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
 
+def calcular_edad(fecha_nacimiento):
+    hoy = datetime.today()
+    edad = hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    return edad
 
 def registrarse(request):
     if request.method == 'POST':
         if request.POST.get("clave1") == request.POST.get("clave2"):
+            # Validación de la fecha de nacimiento
+            fecha_nacimiento_str = request.POST.get("fechaNacimiento")
+            if fecha_nacimiento_str:
+                fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%Y-%m-%d')
+                edad = calcular_edad(fecha_nacimiento)
+                
+                if edad < 18:
+                    messages.warning(request, "Debes ser mayor de 18 años para registrarte.")
+                    return redirect("index")
+            else:
+                messages.warning(request, "La fecha de nacimiento es requerida.")
+                return redirect("index")
+
+            # Proceso de foto
             foto = request.FILES.get("foto")
             if foto is not None:
                 handle_uploaded_file(foto)
@@ -1027,6 +1045,7 @@ def registrarse(request):
             else:
                 foto = "fotos/default.png"
 
+            # Proceso de contraseña
             clave = hash_password(request.POST.get("clave1"))
             print("Creamos instancia")
             q = Usuario(
@@ -1037,7 +1056,8 @@ def registrarse(request):
             )
             q.save()
             messages.success(request, "Registro correcto!!!!")
-            # logueo automatico
+            
+            # Logueo automático
             request.session["logueo"] = {
                 "id": q.id,
                 "nombre": q.nombreCompleto,
@@ -1045,7 +1065,7 @@ def registrarse(request):
             }
             return redirect("panelDeGestion")
         else:
-            messages.warning(request, "No coincíden las contraseñas")
+            messages.warning(request, "No coinciden las contraseñas")
             return redirect("index")
     else:
         return render(request, "API/index/index.html")
