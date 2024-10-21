@@ -348,7 +348,7 @@ def clientes_actualizar(request):
 def clientes_eliminar(request, id):
     try:
         cliente = Cliente.objects.get(pk=id)
-        if Pedido.objects.filter(clientes=cliente).exists():  # Corregido 'cliente' por 'clientes'
+        if Pedido.objects.filter(cliente=cliente).exists():  # Corregido 'cliente' por 'clientes'
             messages.error(request, "No se puede eliminar el cliente porque tiene pedidos asociados.")
         else:
             cliente.delete()
