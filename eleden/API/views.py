@@ -20,6 +20,7 @@ from django.template.loader import render_to_string
 from .encriptar import *
 from .serializers import *
 from django.contrib.auth import authenticate, login as django_login
+from datetime import datetime
 
 # Create your views here.
 
@@ -685,6 +686,19 @@ def productos_guardar(request):
         precio = request.POST.get("precio")
         foto = request.FILES.get("foto")
 
+        # Validar fecha de vencimiento
+        if fecha_vencimiento:
+            try:
+                fecha_vencimiento = datetime.strptime(fecha_vencimiento, '%Y-%m-%d').date()
+                hoy = timezone.now().date()
+                if fecha_vencimiento < hoy:
+                    messages.error(request, "La fecha de vencimiento no puede ser anterior a la fecha actual.")
+                    return redirect('registrar_producto')
+
+            except ValueError:
+                messages.error(request, "Formato de fecha inválido.")
+                return redirect('registrar_producto')
+
         try:
             q = ProductoTerminado(
                 nombre=nombre,
@@ -707,7 +721,6 @@ def productos_guardar(request):
             messages.error(request, f"Error: {e}")
 
     return redirect("productoTerminado")
-
 
 
 def productos_actualizar(request, id):

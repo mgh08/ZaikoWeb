@@ -24,3 +24,9 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+
+document.addEventListener("DOMContentLoaded", function() {
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById("fecha_vencimiento").setAttribute("min", today);
+    });
