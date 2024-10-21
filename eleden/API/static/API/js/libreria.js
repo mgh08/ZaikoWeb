@@ -1,3 +1,39 @@
+
+
+var proveedores = {{ proveedores | safe }}; 
+
+document.getElementById('formMateriaPrima').addEventListener('submit', function(event) {
+    var nombre_proveedor = document.getElementById('nombre').value;
+    
+    if (!proveedores.includes(nombre_proveedor)) {
+        event.preventDefault();
+        
+        Swal.fire({
+            title: "</strong>Proveedor no encontrado</strong>",
+            icon: "info",
+            html: `
+              <b>¿Desea agregar este proveedor?</b>,
+              
+            `,
+            showCloseButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonText: `
+              Agregar
+            `,
+            confirmButtonAriaLabel: "Thumbs up, great!",
+            cancelButtonText: `
+              Cancelar
+            `,
+            cancelButtonAriaLabel: "Thumbs down"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/ruta/a/formulario/de/proveedores";
+            }
+        });
+    }
+});
+
 function verProducto(ruta) {
     var contenedor = $("#offcanvasRight");
 
