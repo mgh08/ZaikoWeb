@@ -20,11 +20,11 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="unidad_medida" class="form-label">Unidad de medida</label>
-                    <select class="form-select" value="{{ registro.unidad_medida }}" name="unidad_medida" required>
-                        <option >Selecciona una medida</option>
-                        <option >Pacas</option>
-                        <option >Gramos</option>
-                        <option >Kilos</option>
+                    <select class="form-select" name="unidad_medida" required>
+                        <option value="" {% if not registro.unidad_medida %}selected{% endif %}>Selecciona una medida</option>
+                        <option value="Pacas" {% if registro.unidad_medida == "Pacas" %}selected{% endif %}>Pacas</option>
+                        <option value="Gramos" {% if registro.unidad_medida == "Gramos" %}selected{% endif %}>Gramos</option>
+                        <option value="Kilos" {% if registro.unidad_medida == "Kilos" %}selected{% endif %}>Kilos</option>
                     </select>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                     <select class="form-control" name="categorias" required>
                         <option value="">Selecciona una categoría</option>
                         {% for c in categorias %}
-                        <option value="{{ c.id }}" {% if registro.CategoriaProducto.id == c.id %}selected{% endif %}>{{ c.nombre_categoria }}</option>
+                        <option value="{{ c.id }}" {% if registro.categorias.id == c.id %}selected{% endif %}>{{ c.nombre_categoria }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -58,7 +58,7 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento</label>
-                    <input type="date" class="form-control" value="{{ registro.fecha_vencimiento }}" name="fecha_vencimiento" id="fecha_vencimiento" required>
+                    <input type="date" class="form-control" value="{{ registro.fecha_vencimiento|date:'Y-m-d' }}" name="fecha_vencimiento" id="fecha_vencimiento" required>
                 </div>
             </div>            
             <div class="col-md-6">
@@ -70,12 +70,22 @@
         </div>
         <div class="mb-3">
             <label for="imagen" class="form-label">Imagen del Producto</label>
-            <input type="file" class="form-control" value="{{ registro.foto }}" name="foto" id="foto" accept="image/*">
+            
+            <!-- Mostrar la imagen actual si existe -->
+            {% if registro.foto %}
+                <div class="mb-2">
+                    <img src="{{ registro.foto.url }}" width="150" alt="Imagen del Producto">
+                </div>
+            {% endif %}
+            
+            <!-- Campo de archivo para cargar una nueva imagen -->
+            <input type="file" class="form-control" name="foto" id="foto" accept="image/*">
         </div>
         <div>
             <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
         </div>
     </form>
+    
 </section>
 
 

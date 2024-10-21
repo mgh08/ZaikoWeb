@@ -731,9 +731,11 @@ def productos_guardar(request):
 def productos_actualizar(request, id):
     p = ProductoTerminado.objects.get(pk=id)
     try:
+        # Verificar si se subió una nueva imagen o mantener la existente
         foto = request.FILES.get("foto")
         if foto is None:
-            foto = p.foto
+            foto = p.foto  # Mantener la imagen existente si no se sube una nueva
+        
         p.foto = foto
         p.nombre = request.POST.get("nombre")
         p.unidad_medida = request.POST.get("unidad_medida")
@@ -748,7 +750,9 @@ def productos_actualizar(request, id):
     except Exception as e:
         messages.error(request, f"Error: {e}")
         return redirect("productoTerminado")
+    
     return redirect("productoTerminado")
+
 
 
 def productos_formulario_editar(request, id):
