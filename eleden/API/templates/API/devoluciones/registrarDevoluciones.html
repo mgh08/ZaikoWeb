@@ -25,8 +25,16 @@
                 <label for="imagen" class="form-label">Foto</label>
                 <input type="file" name="foto" id="foto" class="form-control" accept="image/png, image/jpeg, image/jpg">
             
-                <label for="productos" class="form-label">Productos</label>
-                <input type="text" name="productos" id="productos" class="form-control" value="{{ registro.productos }}" required>
+
+                <div class="col-md-5">
+                    <label>Producto: </label>
+                    <select class="form-control producto-select" name="productos" required>
+                        <option value="">Selecciona un producto</option>
+                        {% for p in productos %}
+                            <option value="{{ p.nombre }}">{{ p.nombre }}</option>  <!-- Usar value para enviar el nombre del producto -->
+                        {% endfor %}
+                    </select>
+                </div>
                 
                 <br>
                 <div>
@@ -43,8 +51,3 @@
 </script>      
            
 {% endblock %}
-                        
-                        
-
-                            
-
