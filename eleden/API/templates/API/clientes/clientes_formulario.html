@@ -9,19 +9,34 @@
             <h1 class="title-tablas">Crear o actualizar Cliente</h1>
             <a class="btn-regresar" href="{% url 'clientes' %}"><i class="fa-solid fa-reply"></i></a>
         </div>
+        
         <input type="hidden" name="id" value="{{ registro.id }}"><br>
+
         <label>Nombre: </label>
-        <input type="text" name="nombre" class="form-control" value="{{ registro.nombre }}"><br>
+        <input type="text" name="nombre" class="form-control" value="{{ registro.nombre }}" 
+               pattern="[A-Za-z0-9\s]+" title="El nombre solo puede contener letras, números" required><br>
+
         <label>NIT: </label>
-        <input type="text" name="nit" class="form-control" value="{{ registro.nit }}"><br>
+        <input type="text" name="nit" class="form-control" value="{{ registro.nit }}" 
+               pattern="\d+" title="El NIT solo debe contener números" required><br>
+
         <label>Contacto: </label>
-        <input type="text" name="contacto" class="form-control" value="{{ registro.contacto }}"><br>
-        <label>Correo_Electronico: </label>
-        <input type="text" name="correo_electronico" class="form-control" value="{{ registro.correo_electronico }}"><br>
-        <label>Direccion: </label>
-        <input type="text" name="direccion" class="form-control" value="{{ registro.direccion }}"><br>
+        <input type="tel" name="contacto" class="form-control" value="{{ registro.contacto }}"
+               pattern="^(?:\+57)?(3\d{9}|[1-9]\d{6,7})$" 
+               title="Ingrese un número válido. Móvil (10 dígitos) o fijo (7-8 dígitos con o sin indicativo de ciudad)" required><br>
+
+        <label>Correo Electrónico: </label>
+        <input type="email" name="correo_electronico" class="form-control" value="{{ registro.correo_electronico }}" 
+               title="Ingrese un correo electrónico válido" required><br>
+
+        <label>Dirección: </label>
+        <input type="text" name="direccion" class="form-control" value="{{ registro.direccion }}" 
+               pattern="^[A-Za-z0-9\s.,#-]+$" title="La dirección solo puede contener letras, números, espacios y los caracteres ., #-." required><br>
+
         <br>
-        <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
+        <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">
+            {% if registro %}Actualizar{% else %}Guardar{% endif %}
+        </button>
     </form>
 </section>
 {% endblock %}

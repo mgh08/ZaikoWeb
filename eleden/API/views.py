@@ -680,6 +680,10 @@ def productos_eliminar(request, id):
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
+from django.core.exceptions import ValidationError
+from datetime import datetime
+from django.utils import timezone
+
 def productos_guardar(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
@@ -691,19 +695,58 @@ def productos_guardar(request):
         precio = request.POST.get("precio")
         foto = request.FILES.get("foto")
 
+        # Validaciones
+        errores = []
+
+        # Validar campos vacíos
+        if not nombre:
+            errores.append("El nombre del producto es obligatorio.")
+        if not unidad_medida:
+            errores.append("La unidad de medida es obligatoria.")
+        if not cantidad:
+            errores.append("La cantidad es obligatoria.")
+        if not precio:
+            errores.append("El precio es obligatorio.")
+        
+        # Validar cantidad y precio sean números positivos
+        try:
+            cantidad = float(cantidad)
+            if cantidad <= 0:
+                errores.append("La cantidad debe ser un valor positivo.")
+        except ValueError:
+            errores.append("La cantidad debe ser un número válido.")
+
+        try:
+            precio = float(precio)
+            if precio <= 0:
+                errores.append("El precio debe ser un valor positivo.")
+        except ValueError:
+            errores.append("El precio debe ser un número válido.")
+        
         # Validar fecha de vencimiento
         if fecha_vencimiento:
             try:
                 fecha_vencimiento = datetime.strptime(fecha_vencimiento, '%Y-%m-%d').date()
                 hoy = timezone.now().date()
                 if fecha_vencimiento < hoy:
-                    messages.error(request, "La fecha de vencimiento no puede ser anterior a la fecha actual.")
-                    return redirect('registrar_producto')
-
+                    errores.append("La fecha de vencimiento no puede ser anterior a la fecha actual.")
             except ValueError:
-                messages.error(request, "Formato de fecha inválido.")
-                return redirect('registrar_producto')
+                errores.append("Formato de fecha inválido.")
 
+        # Validar foto sea una imagen
+        if foto:
+            if not foto.content_type.startswith('image'):
+                errores.append("El archivo subido debe ser una imagen.")
+            if foto.size > 5 * 1024 * 1024:  # Limitar a 5MB
+                errores.append("La imagen no puede superar los 5MB.")
+        
+        # Si hay errores, mostrarlos y redirigir al formulario
+        if errores:
+            for error in errores:
+                messages.error(request, error)
+            return redirect('registrar_producto')
+
+        # Guardar producto si no hay errores
         try:
             q = ProductoTerminado(
                 nombre=nombre,
@@ -715,13 +758,13 @@ def productos_guardar(request):
                 precio=precio,
                 foto=foto
             )
-            q.full_clean()  # Esto activará las validaciones definidas
+            q.full_clean()  # Activa las validaciones definidas en el modelo
             q.save()
             messages.success(request, "Registro guardado correctamente!!")
         except ValidationError as e:
             for error in e.messages:
                 messages.error(request, error)
-            return redirect('registrar_producto')  # Redirige al formulario para corregir errores
+            return redirect('registrar_producto')
         except Exception as e:
             messages.error(request, f"Error: {e}")
 
