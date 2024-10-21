@@ -30,6 +30,33 @@ function confirmar_eliminar(ruta) {
     });
 }
 
+function confirmar_guardar(event) {
+    event.preventDefault(); // Evitar el envío del formulario por defecto
+
+    Swal.fire({
+        title: '¿Está seguro?',
+        text: "Una vez guardado, no podrás modificar este pedido.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, guardar pedido',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Enviar el formulario manualmente si se confirma
+            document.getElementById("pedidoForm").submit();
+        } else {
+            Swal.fire(
+                'Cancelado',
+                'El pedido no ha sido guardado.',
+                'info'
+            );
+        }
+    });
+}
+
+
 $(document).ready(function() {
     var footer = $(".pie-pagina");
     var windowHeight = $(window).height();
@@ -93,5 +120,26 @@ function add_carrito(ruta, id){
         alert( "error" );
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('acceptTerms').addEventListener('click', function () {
+        // Usar SweetAlert2 para mostrar la alerta
+        Swal.fire({
+            title: 'Términos aceptados',
+            text: 'Has aceptado los términos y condiciones.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Cerrar el modal después de aceptar
+                var modal = bootstrap.Modal.getInstance(document.getElementById('termsModal'));
+                modal.hide();
+
+                // Recargar la página
+                location.reload();
+            }
+        });
+    });
+});
 
 

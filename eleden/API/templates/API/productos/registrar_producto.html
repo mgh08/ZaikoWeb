@@ -58,9 +58,9 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento</label>
-                    <input type="date" class="form-control" value="{{ registro.fecha_vencimiento }}" name="fecha_vencimiento">
+                    <input type="date" class="form-control" value="{{ registro.fecha_vencimiento }}" name="fecha_vencimiento" id="fecha_vencimiento" required>
                 </div>
-            </div>
+            </div>            
             <div class="col-md-6">
                 <div class="mb-3">
                     <label for="precio" class="form-label">Precio</label>
@@ -77,5 +77,8 @@
         </div>
     </form>
 </section>
+
+
+
 
 {% endblock %}

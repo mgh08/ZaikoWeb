@@ -1,59 +1,70 @@
 {% extends "API/bases/baseAdmin.html" %}
-
 {% load static %}
 
 {% block contenido %}
 
 <div class="card-body">
-    <section class="tablas" >
+    <section class="tablas">
         {% csrf_token %}
         <div class="tablas-formularios">
-            <h1 class="title-tablas">Pedidos</h1>
-            <a class="btn btn-success btn-tablas" href="{% url 'pedidos_formulario' %}"><i class="fa-solid fa-plus"></i></a>
-            <table class="table" id="datatablesSimple">
-                <thead>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="title-tablas">Pedidos</h1>
+                <a class="btn btn-success" href="{% url 'pedidos_formulario' %}">
+                    <i class="fa-solid fa-plus"></i> Nuevo Pedido
+                </a>
+            </div>
+            
+            <table class="table table-striped table-hover" id="datatablesSimple">
+                <thead class="table-dark">
                     <tr>
-                        <th>ID</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Precio total</th>
-                        <th>Productos</th>
-                        <th>Cliente</th>
-                        <th>Fecha del Pedido</th>
+                        <th scope="col">#</th>
+                        <th scope="col">Productos y Cantidades</th>
+                        <th scope="col">Precio Total</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Fecha del Pedido</th>
+                        {% if request.session.logueo.rol == "GEREN" %}
+                            <th scope="col">Acciones</th>
+                        {% endif %}
                     </tr>
                 </thead>
-            <tbody>
-                {% for r in data %}
-                <tr>
-                    <td>{{ r.id }}</td>
-                    <td>{{ r.cantidad }}</td>
-                    <td>{{ r.precio_unitario }}</td>
-                    <td>{{ r.precio_total }}</td>
-                    <td>{{ r.productos }}</td>
-                    <td>{{ r.clientes }}</td>
-                    <td>{{ r.fecha_pedido }}</td>
-                     <td>
-                        <a class="btn btn-warning" href="{% url 'pedidos_formulario_editar' id=r.id %}">Editar</a>
-                        <a class="btn btn-danger" href="javascript:confirmar_eliminar(`{% url 'pedidos_eliminar' r.id %}`)">Eliminar</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                </table>
-            
-                <nav aria-label="...">
-                    <ul class="pagination pagination-lg">
-                        <li class="page-item active" aria-current="page">
-                            <span class="page-link">1</span>
-                        </li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    </ul>
-                </nav>
-    
-            </tbody>
+                <tbody>
+                    {% for pedido in data %}
+                    <tr>
+                        <td>{{ pedido.id }}</td>
+                        <td>
+                            <ul>
+                                {% for producto in pedido.productos.all %}
+                                    <li>{{ producto.producto.nombre }} - Cantidad: {{ producto.cantidad }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ pedido.precio_total|floatformat:2 }}</td>
+                        <td>{{ pedido.cliente.nombre }}</td>
+                        <td>{{ pedido.fecha_pedido }}</td>
+                        {% if request.session.logueo.rol == "GEREN" %}
+                            <td>
+                                <a class="btn btn-danger btn-sm" href="javascript:confirmar_eliminar('{% url 'pedidos_eliminar' pedido.id %}')">
+                                    <i class="fa-solid fa-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Paginación -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item active">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+            </nav>
         </div>
     </section>
 </div>
 
-    
 {% endblock %}

@@ -13,26 +13,27 @@
                     <h1 class="mt-4 title-tablas">Registro de Devoluciones</h1>
                     <a class="btn-regresar" href="{% url 'listarDevoluciones' %}"><i class="fa-solid fa-reply"></i></a>
                 </div>
-                <!-- <label for="#"  class="form-label">nombre</label>
-                <input type="text" name="nombre" id="nombre" class="form-control" required>-->
+            
                 <input type="hidden" name="id" value="{{ registro.id }}">
-
+            
                 <label for="fecha" class="form-label">Fecha de Devolución</label>
                 <input type="text" class="form-control" id="fecha" name="fecha_devolucion" readonly>
+            
+                <label for="motivo" class="form-label">Motivo</label>
+                <input type="text" name="motivo" id="motivo" class="form-control" value="{{ registro.motivo }}" pattern="[A-Za-z\s]+" title="Por favor, ingrese solo letras" required>
+            
+                <label for="imagen" class="form-label">Foto</label>
+                <input type="file" name="foto" id="foto" class="form-control" accept="image/png, image/jpeg, image/jpg">
+            
+                <label for="productos" class="form-label">Productos</label>
+                <input type="text" name="productos" id="productos" class="form-control" value="{{ registro.productos }}" required>
                 
-                <label for="motivo"  class="form-label">Motivo</label>
-                <input type="text" name="motivo" id="motivo" class="form-control" value="{{ registro.motivo }}" pattern="[A-Za-z\s]*" title="Por favor, ingrese solo letras" required>
-
-                <label for="imagen"  class="form-label">foto</label>
-                <input type="file" name="foto" id="foto" class="form-control" value="{{ registro.foto }}"  accept="image/*">
-                
-                <label for="productos"  class="form-label">Productos</label>
-                <input type="text" name="productos" id="productos" class="form-control" value="{{ registro.productos }}" pattern="[A-Za-z\s]*" title="Por favor, ingrese solo letras" >
                 <br>
                 <div>
                     <button type="submit" class="btn btn-{% if registro %}info{% else %}success{% endif %}">{% if registro %}Actualizar{% else %}Guardar{% endif %}</button>
                 </div>
             </form>
+            
         </div>
     </div>
 </section>

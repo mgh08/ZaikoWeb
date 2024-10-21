@@ -3,14 +3,13 @@
     {% for message in messages %}
         <div class="alert alert-{% if message.tags and message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" productos-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endfor %}
 {% endif %}
 
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasRightLabel">Productos ({{ request.session.items_carrito|default:0 }})</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
         <table class="table">
@@ -26,22 +25,62 @@
                 {% for p in data  %}
                 <tr>
                     <td>
-                        <img src="{{ p.foto.url }}" width="20%" />
+                        <img src="{{ p.foto.url }}" width="25%" />
                         <br>
                         {{ p.nombre }}<br>Precio: <strong>${{ p.precio|intcomma }}</strong>
                     </td>
-                    <td>{{ p.cantidad }}</td>
-                    <td>${{ p.subtotal|intcomma }}</td>
-                    <td><a href="javascript:del_item_carrito(`{% url 'eliminar_item_carrito' p.id %}`);"><i class="fa-solid fa-circle-xmark"></i></a></td>
+                    <td>{{ p.stock }}</td>
+                    <td id="subtotal">${{ p.subtotal|intcomma }}</td>
+                    <td>
+                        <a class="btn btn-danger" href="javascript:eliminar_item_carrito(`{% url 'eliminar_item_carrito' p.id %}`);">X</a>
+                    </td>                   
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         Total: <strong>${{ total|intcomma }}</strong><br/><br/>
-        <div style="display: flex;flex-direction: column; width: 150px;margin: auto;">
-            <a href="{% url 'vaciar_carrito' %}" class="btn btn-secondary">Vaciar carrito</a>
+        <div style="display: flex;flex-direction: row; justify-content: space-around;">
+            <a href="{% url 'vaciar_carrito' %}" class="btn btn-danger">Vaciar carrito</a>
             <br>
-            <a href="{% url 'guardar_compra' %}" class="btn btn-primary">Comprar</a>
+            <a href="{% url 'guardar_compra' %}" class="btn btn-success">Comprar</a>
         </div>
-    </div>
+    </div>
 
+<script>
+    function eliminar_item_carrito(url){
+        contenido = $("#offcanvasRight")
+        items_carrito = $("#items_carrito")
+        loader = $("#loader")
+    
+        loader.removeClass("d-none");
+        loader.addClass("d-block");
+    
+        $.ajax({
+            url: url
+        })
+        .done(function(respuesta){
+    
+            if (respuesta != "Error"){
+    
+                loader.removeClass("d-block");
+                loader.addClass("d-none");
+                // Pintar respuesta en offCanvas
+                contenido.html(respuesta);
+    
+                //Buscar items en html resultante
+                let position_ini = respuesta.search(" ");
+                let position_final = respuesta.search("</h1>");
+                let result = respuesta.substring(position_ini+2, position_final-1);
+                items_carrito.html(result);
+            }
+            else{
+                location.href="carrito/carrito.html";
+            }
+        })
+        .fail(function(respuesta){
+            location.href="/tienda/";
+        });
+    }
+    
+</script>
+{% comment %} <script src="{% static 'API/js/libreria.js' %}"></script> {% endcomment %}

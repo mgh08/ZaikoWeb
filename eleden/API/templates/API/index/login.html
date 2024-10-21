@@ -10,38 +10,39 @@
         {% endfor %}
     </ul>
 {% endif %}
-<p>{{ message }}</p>
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-5 col-3 text-center" style="background-color: azul;">
-        <div class="card-header" style="background-color: azul;">
-            <p>{{ message }}</p>
 
-            <p style="color: red">Debes inicar sesion para poder continuar... </p>
-            <form class="form form-register" action="{% url 'login' %}" method="post">
-                {% csrf_token %}
-                <br>
-                <div>
-                    <label>
-                        <i class="fa-solid fa-user"></i>
-                        <input type="text" placeholder="Nombre Usuario" name="usuario"
-                            autocomplete="off">
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <i class="fa-solid fa-lock"></i>
-                        <input type="password" placeholder="Contraseña" name="clave"
-                            autocomplete="off">
-                    </label>
-                </div>
+<div class="contenedorCentrado" style="margin-top: 150px; margin-bottom: 50px;">
+    <div class="container-form">
+        <div class="information-warning">
+            <div class="info-childs">
+                <img src="{% static 'API/img/logo/logo-1.png' %}" alt="Logo">
+                <h2>¡Acceso Restringido!</h2>
+                <p>Debes iniciar sesión para poder continuar...</p>
+            </div>
+        </div>
+        <div class="form-information-warning">
+            <div class="form-information-childs">
+                <form class="form form-register" action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
                     <br>
-                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" placeholder="Nombre Usuario" name="usuario" autocomplete="off">
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Contraseña" name="clave" autocomplete="off">
+                        </label>
+                    </div>
                     <br>
-                </div>
-            </form>
+                    <button type="submit" class="btn btn-danger">Iniciar Sesión</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-
 
 {% endblock %}
