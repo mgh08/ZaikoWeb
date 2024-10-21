@@ -1,5 +1,5 @@
 venv/
-eleden/db.sqlite3
+# eleden/db.sqlite3
 eleden/API/__pycache__/urls.cpython-311.pyc
 .idea/workspace.xml
 eleden/API/__pycache__/__init__.cpython-311.pyc

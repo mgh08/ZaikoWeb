@@ -413,7 +413,12 @@ def listarDevoluciones(request):
 
 
 def registrar_devoluciones(request):
-    return render(request, 'API/devoluciones/registrarDevoluciones.html')
+    productos = ProductoTerminado.objects.all()  # Obtener todos los productos registrados
+    context = {
+        'productos': productos  # Pasar los productos al contexto
+    }
+    return render(request, 'API/devoluciones/registrarDevoluciones.html', context)
+
 
 
 def devoluciones_eliminar(request, id):
