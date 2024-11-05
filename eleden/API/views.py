@@ -1068,17 +1068,17 @@ def registrarse(request):
     if request.method == 'POST':
         if request.POST.get("clave1") == request.POST.get("clave2"):
             # Validación de la fecha de nacimiento
-            fecha_nacimiento_str = request.POST.get("fechaNacimiento")
-            if fecha_nacimiento_str:
-                fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%Y-%m-%d')
-                edad = calcular_edad(fecha_nacimiento)
-                
-                if edad < 18:
-                    messages.warning(request, "Debes ser mayor de 18 años para registrarte.")
-                    return redirect("index")
-            else:
-                messages.warning(request, "La fecha de nacimiento es requerida.")
-                return redirect("index")
+                # fecha_nacimiento_str = request.POST.get("fechaNacimiento")
+                # if fecha_nacimiento_str:
+                #     fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%Y-%m-%d')
+                #     edad = calcular_edad(fecha_nacimiento)
+                    
+                #     if edad < 18:
+                #         messages.warning(request, "Debes ser mayor de 18 años para registrarte.")
+                #         return redirect("index")
+                # else:
+                #     messages.warning(request, "La fecha de nacimiento es requerida.")
+                #     return redirect("index")
 
             # Proceso de foto
             foto = request.FILES.get("foto")

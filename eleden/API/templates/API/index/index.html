@@ -390,12 +390,6 @@
                                 <form class="form" action="{% url 'registrarse' %}" method='post'>
                                     {% csrf_token %}
                                     <div>
-                                        <label for="fechaNacimiento">
-                                            Fecha de Nacimiento:
-                                        </label>
-                                        <input type="date" name="fechaNacimiento" id="fechaNacimiento" required>
-                                    </div>
-                                    <div>
                                         <label>
                                             <i class="fa-solid fa-user"></i>
                                             <input type="text" placeholder="Nombre completo" name="nombreCompleto"
@@ -602,12 +596,6 @@
                                       novalidate>
                                     {% csrf_token %}
                                     <div>
-                                        <div>
-                                            <label for="fechaNacimiento">
-                                                Fecha de Nacimiento:
-                                            </label>
-                                            <input type="date" name="fechaNacimiento" id="fechaNacimiento" required>
-                                        </div>
                                         <label>
                                             <i class="fa-solid fa-user"></i>
                                             <input type="text" placeholder="Nombre completo" name="nombreCompleto"
