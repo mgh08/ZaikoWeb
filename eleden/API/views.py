@@ -680,6 +680,10 @@ def productos_eliminar(request, id):
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
+from django.core.exceptions import ValidationError
+from datetime import datetime
+from django.utils import timezone
+
 def productos_guardar(request):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
@@ -691,19 +695,58 @@ def productos_guardar(request):
         precio = request.POST.get("precio")
         foto = request.FILES.get("foto")
 
+        # Validaciones
+        errores = []
+
+        # Validar campos vacíos
+        if not nombre:
+            errores.append("El nombre del producto es obligatorio.")
+        if not unidad_medida:
+            errores.append("La unidad de medida es obligatoria.")
+        if not cantidad:
+            errores.append("La cantidad es obligatoria.")
+        if not precio:
+            errores.append("El precio es obligatorio.")
+        
+        # Validar cantidad y precio sean números positivos
+        try:
+            cantidad = float(cantidad)
+            if cantidad <= 0:
+                errores.append("La cantidad debe ser un valor positivo.")
+        except ValueError:
+            errores.append("La cantidad debe ser un número válido.")
+
+        try:
+            precio = float(precio)
+            if precio <= 0:
+                errores.append("El precio debe ser un valor positivo.")
+        except ValueError:
+            errores.append("El precio debe ser un número válido.")
+        
         # Validar fecha de vencimiento
         if fecha_vencimiento:
             try:
                 fecha_vencimiento = datetime.strptime(fecha_vencimiento, '%Y-%m-%d').date()
                 hoy = timezone.now().date()
                 if fecha_vencimiento < hoy:
-                    messages.error(request, "La fecha de vencimiento no puede ser anterior a la fecha actual.")
-                    return redirect('registrar_producto')
-
+                    errores.append("La fecha de vencimiento no puede ser anterior a la fecha actual.")
             except ValueError:
-                messages.error(request, "Formato de fecha inválido.")
-                return redirect('registrar_producto')
+                errores.append("Formato de fecha inválido.")
 
+        # Validar foto sea una imagen
+        if foto:
+            if not foto.content_type.startswith('image'):
+                errores.append("El archivo subido debe ser una imagen.")
+            if foto.size > 5 * 1024 * 1024:  # Limitar a 5MB
+                errores.append("La imagen no puede superar los 5MB.")
+        
+        # Si hay errores, mostrarlos y redirigir al formulario
+        if errores:
+            for error in errores:
+                messages.error(request, error)
+            return redirect('registrar_producto')
+
+        # Guardar producto si no hay errores
         try:
             q = ProductoTerminado(
                 nombre=nombre,
@@ -715,13 +758,13 @@ def productos_guardar(request):
                 precio=precio,
                 foto=foto
             )
-            q.full_clean()  # Esto activará las validaciones definidas
+            q.full_clean()  # Activa las validaciones definidas en el modelo
             q.save()
             messages.success(request, "Registro guardado correctamente!!")
         except ValidationError as e:
             for error in e.messages:
                 messages.error(request, error)
-            return redirect('registrar_producto')  # Redirige al formulario para corregir errores
+            return redirect('registrar_producto')
         except Exception as e:
             messages.error(request, f"Error: {e}")
 
@@ -731,9 +774,11 @@ def productos_guardar(request):
 def productos_actualizar(request, id):
     p = ProductoTerminado.objects.get(pk=id)
     try:
+        # Verificar si se subió una nueva imagen o mantener la existente
         foto = request.FILES.get("foto")
         if foto is None:
-            foto = p.foto
+            foto = p.foto  # Mantener la imagen existente si no se sube una nueva
+        
         p.foto = foto
         p.nombre = request.POST.get("nombre")
         p.unidad_medida = request.POST.get("unidad_medida")
@@ -748,7 +793,9 @@ def productos_actualizar(request, id):
     except Exception as e:
         messages.error(request, f"Error: {e}")
         return redirect("productoTerminado")
+    
     return redirect("productoTerminado")
+
 
 
 def productos_formulario_editar(request, id):
@@ -1012,10 +1059,28 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
 
+def calcular_edad(fecha_nacimiento):
+    hoy = datetime.today()
+    edad = hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+    return edad
 
 def registrarse(request):
     if request.method == 'POST':
         if request.POST.get("clave1") == request.POST.get("clave2"):
+            # Validación de la fecha de nacimiento
+            fecha_nacimiento_str = request.POST.get("fechaNacimiento")
+            if fecha_nacimiento_str:
+                fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%Y-%m-%d')
+                edad = calcular_edad(fecha_nacimiento)
+                
+                if edad < 18:
+                    messages.warning(request, "Debes ser mayor de 18 años para registrarte.")
+                    return redirect("index")
+            else:
+                messages.warning(request, "La fecha de nacimiento es requerida.")
+                return redirect("index")
+
+            # Proceso de foto
             foto = request.FILES.get("foto")
             if foto is not None:
                 handle_uploaded_file(foto)
@@ -1023,6 +1088,7 @@ def registrarse(request):
             else:
                 foto = "fotos/default.png"
 
+            # Proceso de contraseña
             clave = hash_password(request.POST.get("clave1"))
             print("Creamos instancia")
             q = Usuario(
@@ -1033,7 +1099,8 @@ def registrarse(request):
             )
             q.save()
             messages.success(request, "Registro correcto!!!!")
-            # logueo automatico
+            
+            # Logueo automático
             request.session["logueo"] = {
                 "id": q.id,
                 "nombre": q.nombreCompleto,
@@ -1041,7 +1108,7 @@ def registrarse(request):
             }
             return redirect("panelDeGestion")
         else:
-            messages.warning(request, "No coincíden las contraseñas")
+            messages.warning(request, "No coinciden las contraseñas")
             return redirect("index")
     else:
         return render(request, "API/index/index.html")
